@@ -1,0 +1,461 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1844F6F2FDAB726E2AB70D01 /* BundledDatasets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B278DCF25107982400E6398F /* BundledDatasets.swift */; };
+		1D4B8288173F7034F58930C3 /* places.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3FC401ACE05767EEFED1384A /* places.bin */; };
+		2016D95CDEF95A38EBFDDC51 /* AdaptiveRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A1C45D2E63AE3BCB4B86D8 /* AdaptiveRoot.swift */; };
+		3013398A2E9537D2D29A26A1 /* PreFlightSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2B3331A61A641CF72F9116 /* PreFlightSurface.swift */; };
+		4DBA6CBAFC8C54606AA4EE25 /* MetricsSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B51143711397BB51CB83074 /* MetricsSurface.swift */; };
+		5DBDEFEF917E614DAFDB9C8B /* ContrailGeo in Frameworks */ = {isa = PBXBuildFile; productRef = 72ECA25E40918ABF69E71DC6 /* ContrailGeo */; };
+		6000E0C5A8825F68E2809AEF /* airports.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3B442355D4151A2012D0EAFC /* airports.bin */; };
+		6E8FE6B4D6C5148B08FD465E /* ContrailSensors in Frameworks */ = {isa = PBXBuildFile; productRef = 2030282CE29197AB5A231805 /* ContrailSensors */; };
+		89E85BF6DC6EA71A126D753D /* ContrailData in Frameworks */ = {isa = PBXBuildFile; productRef = 2BCC1B63BEF7B2289F64110C /* ContrailData */; };
+		9E5A9988A469457DCC19AB90 /* LiveSensorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442A28D04C1008537AC81CA2 /* LiveSensorSource.swift */; };
+		A3DBB30879E60F3F1E68CCBE /* ContrailCore in Frameworks */ = {isa = PBXBuildFile; productRef = 974623BF2557F7C33C2857F2 /* ContrailCore */; };
+		AC68838F48FB4FE41C8D3378 /* FixQualitySurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9483514C6130E773BF9DCC8D /* FixQualitySurface.swift */; };
+		B345012396EBA7C398862D41 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFAD5055A636A01AD695A52B /* AppModel.swift */; };
+		B78F96DF6620DC4795731171 /* FlightEstimationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E17A4438C2266045DFD0DD /* FlightEstimationEngine.swift */; };
+		B7DDBA9C379328650B78F7F4 /* ContrailApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54924CA940EAF7266C0DEA0 /* ContrailApp.swift */; };
+		EA97E83F98CEADCBF1913D77 /* ContrailEstimator in Frameworks */ = {isa = PBXBuildFile; productRef = BA35708646A97D40EB4307DB /* ContrailEstimator */; };
+		EE161A472B0A1B0C7B513323 /* ContrailLog in Frameworks */ = {isa = PBXBuildFile; productRef = 08F75B0A8BA42893CB144811 /* ContrailLog */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		3B442355D4151A2012D0EAFC /* airports.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = airports.bin; sourceTree = "<group>"; };
+		3FC401ACE05767EEFED1384A /* places.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = places.bin; sourceTree = "<group>"; };
+		442A28D04C1008537AC81CA2 /* LiveSensorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSensorSource.swift; sourceTree = "<group>"; };
+		6B51143711397BB51CB83074 /* MetricsSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsSurface.swift; sourceTree = "<group>"; };
+		72B23E6B62E09B264591E293 /* ContrailKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ContrailKit; path = Packages/ContrailKit; sourceTree = SOURCE_ROOT; };
+		810C09FC241F92A75EE62A7E /* Contrail.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Contrail.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9483514C6130E773BF9DCC8D /* FixQualitySurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixQualitySurface.swift; sourceTree = "<group>"; };
+		9F2B3331A61A641CF72F9116 /* PreFlightSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreFlightSurface.swift; sourceTree = "<group>"; };
+		B278DCF25107982400E6398F /* BundledDatasets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledDatasets.swift; sourceTree = "<group>"; };
+		CFAD5055A636A01AD695A52B /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		F54924CA940EAF7266C0DEA0 /* ContrailApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContrailApp.swift; sourceTree = "<group>"; };
+		F5E17A4438C2266045DFD0DD /* FlightEstimationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightEstimationEngine.swift; sourceTree = "<group>"; };
+		F7A1C45D2E63AE3BCB4B86D8 /* AdaptiveRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveRoot.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		67840B424FCA53A84FC83193 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A3DBB30879E60F3F1E68CCBE /* ContrailCore in Frameworks */,
+				5DBDEFEF917E614DAFDB9C8B /* ContrailGeo in Frameworks */,
+				6E8FE6B4D6C5148B08FD465E /* ContrailSensors in Frameworks */,
+				EA97E83F98CEADCBF1913D77 /* ContrailEstimator in Frameworks */,
+				EE161A472B0A1B0C7B513323 /* ContrailLog in Frameworks */,
+				89E85BF6DC6EA71A126D753D /* ContrailData in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1C16E1480F461B437DB5B5C8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				810C09FC241F92A75EE62A7E /* Contrail.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3B759FC3829262A27AA1BCB5 /* Surfaces */ = {
+			isa = PBXGroup;
+			children = (
+				9483514C6130E773BF9DCC8D /* FixQualitySurface.swift */,
+				6B51143711397BB51CB83074 /* MetricsSurface.swift */,
+				9F2B3331A61A641CF72F9116 /* PreFlightSurface.swift */,
+			);
+			path = Surfaces;
+			sourceTree = "<group>";
+		};
+		75032929CAE0C79BD912F8C8 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F781F446B16B6A6CCC581DCA /* Datasets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		8B509D6092F5CE0F20913C72 /* Live */ = {
+			isa = PBXGroup;
+			children = (
+				B278DCF25107982400E6398F /* BundledDatasets.swift */,
+				F5E17A4438C2266045DFD0DD /* FlightEstimationEngine.swift */,
+				442A28D04C1008537AC81CA2 /* LiveSensorSource.swift */,
+			);
+			path = Live;
+			sourceTree = "<group>";
+		};
+		B885A956124A94B6066EEAE7 = {
+			isa = PBXGroup;
+			children = (
+				C0A165F7E55AB597BD659EFE /* App */,
+				D0D2E654F7D04E3F4F430C8F /* Packages */,
+				1C16E1480F461B437DB5B5C8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C0A165F7E55AB597BD659EFE /* App */ = {
+			isa = PBXGroup;
+			children = (
+				CFAD5055A636A01AD695A52B /* AppModel.swift */,
+				F54924CA940EAF7266C0DEA0 /* ContrailApp.swift */,
+				FCB568BFAF5500292AF47C23 /* Layout */,
+				8B509D6092F5CE0F20913C72 /* Live */,
+				75032929CAE0C79BD912F8C8 /* Resources */,
+				3B759FC3829262A27AA1BCB5 /* Surfaces */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		D0D2E654F7D04E3F4F430C8F /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				72B23E6B62E09B264591E293 /* ContrailKit */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+		F781F446B16B6A6CCC581DCA /* Datasets */ = {
+			isa = PBXGroup;
+			children = (
+				3B442355D4151A2012D0EAFC /* airports.bin */,
+				3FC401ACE05767EEFED1384A /* places.bin */,
+			);
+			path = Datasets;
+			sourceTree = "<group>";
+		};
+		FCB568BFAF5500292AF47C23 /* Layout */ = {
+			isa = PBXGroup;
+			children = (
+				F7A1C45D2E63AE3BCB4B86D8 /* AdaptiveRoot.swift */,
+			);
+			path = Layout;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		76BD3171B1E954A2286D70CE /* Contrail */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 68A365585E13EF105818C5D1 /* Build configuration list for PBXNativeTarget "Contrail" */;
+			buildPhases = (
+				FD4263813344E74C45AEFF3A /* Sources */,
+				0808336E5C8B0D2F89EA4552 /* Resources */,
+				67840B424FCA53A84FC83193 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Contrail;
+			packageProductDependencies = (
+				974623BF2557F7C33C2857F2 /* ContrailCore */,
+				72ECA25E40918ABF69E71DC6 /* ContrailGeo */,
+				2030282CE29197AB5A231805 /* ContrailSensors */,
+				BA35708646A97D40EB4307DB /* ContrailEstimator */,
+				08F75B0A8BA42893CB144811 /* ContrailLog */,
+				2BCC1B63BEF7B2289F64110C /* ContrailData */,
+			);
+			productName = Contrail;
+			productReference = 810C09FC241F92A75EE62A7E /* Contrail.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B39C78F587E12A86869EE428 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = A598001AB62CCFC8F788D732 /* Build configuration list for PBXProject "Contrail" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = B885A956124A94B6066EEAE7;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6E4FCA615AA5CE6D3607D451 /* XCLocalSwiftPackageReference "Packages/ContrailKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1C16E1480F461B437DB5B5C8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				76BD3171B1E954A2286D70CE /* Contrail */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0808336E5C8B0D2F89EA4552 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6000E0C5A8825F68E2809AEF /* airports.bin in Resources */,
+				1D4B8288173F7034F58930C3 /* places.bin in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FD4263813344E74C45AEFF3A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2016D95CDEF95A38EBFDDC51 /* AdaptiveRoot.swift in Sources */,
+				B345012396EBA7C398862D41 /* AppModel.swift in Sources */,
+				1844F6F2FDAB726E2AB70D01 /* BundledDatasets.swift in Sources */,
+				B7DDBA9C379328650B78F7F4 /* ContrailApp.swift in Sources */,
+				AC68838F48FB4FE41C8D3378 /* FixQualitySurface.swift in Sources */,
+				B78F96DF6620DC4795731171 /* FlightEstimationEngine.swift in Sources */,
+				9E5A9988A469457DCC19AB90 /* LiveSensorSource.swift in Sources */,
+				4DBA6CBAFC8C54606AA4EE25 /* MetricsSurface.swift in Sources */,
+				3013398A2E9537D2D29A26A1 /* PreFlightSurface.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2922381173E02036E505BCDE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8D938C48FCD80F19EFC3F274 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		C048E4018E4270243B6694B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Generated/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.contrail.ios;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		FE123F8028D27A19F6AA6194 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Generated/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.contrail.ios;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		68A365585E13EF105818C5D1 /* Build configuration list for PBXNativeTarget "Contrail" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE123F8028D27A19F6AA6194 /* Debug */,
+				C048E4018E4270243B6694B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A598001AB62CCFC8F788D732 /* Build configuration list for PBXProject "Contrail" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D938C48FCD80F19EFC3F274 /* Debug */,
+				2922381173E02036E505BCDE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		6E4FCA615AA5CE6D3607D451 /* XCLocalSwiftPackageReference "Packages/ContrailKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/ContrailKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		08F75B0A8BA42893CB144811 /* ContrailLog */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ContrailLog;
+		};
+		2030282CE29197AB5A231805 /* ContrailSensors */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ContrailSensors;
+		};
+		2BCC1B63BEF7B2289F64110C /* ContrailData */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ContrailData;
+		};
+		72ECA25E40918ABF69E71DC6 /* ContrailGeo */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ContrailGeo;
+		};
+		974623BF2557F7C33C2857F2 /* ContrailCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ContrailCore;
+		};
+		BA35708646A97D40EB4307DB /* ContrailEstimator */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ContrailEstimator;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = B39C78F587E12A86869EE428 /* Project object */;
+}

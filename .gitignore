@@ -15,3 +15,6 @@ Package.resolved
 
 # macOS
 .DS_Store
+
+# Xcode project generation (XcodeGen) — Generated/ holds the derived Info.plist
+Generated/

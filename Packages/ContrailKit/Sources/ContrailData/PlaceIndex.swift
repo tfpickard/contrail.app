@@ -35,4 +35,6 @@ public struct PlaceIndex: Sendable {
     public func nearest(to coordinate: Coordinate) -> PlaceRecord? {
         tree.nearest(to: coordinate)?.payload
     }
+
+    public var count: Int { tree.count }
 }
