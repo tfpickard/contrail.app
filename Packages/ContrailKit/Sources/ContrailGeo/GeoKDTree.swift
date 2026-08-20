@@ -6,7 +6,7 @@ import ContrailCore
 /// distance (`d² = 2 − 2cos θ` for points on a unit sphere), so nearest-Euclidean-
 /// neighbor in this space is exactly nearest-great-circle-neighbor — a 3D k-d tree
 /// over ECEF avoids every antimeridian/pole edge case a naive lat/lon tree would hit.
-private struct ECEFPoint {
+private struct ECEFPoint: Sendable {
     let x: Double, y: Double, z: Double
 
     init(_ c: Coordinate) {
@@ -37,8 +37,8 @@ private struct ECEFPoint {
 /// with bearing and distance, not just a name, so both are computed here at query
 /// time via `VincentyGeodesic` on the winning candidate only (the tree itself only
 /// needs to prune correctly, not report distance precisely).
-public struct GeoKDTree<Payload: Sendable> {
-    private indirect enum Node {
+public struct GeoKDTree<Payload: Sendable>: Sendable {
+    private indirect enum Node: Sendable {
         case leaf
         case branch(point: ECEFPoint, coordinate: Coordinate, payload: Payload, axis: Int, left: Node, right: Node)
     }

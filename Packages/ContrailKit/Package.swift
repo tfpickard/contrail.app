@@ -19,6 +19,8 @@ let package = Package(
         .library(name: "ContrailSensors", targets: ["ContrailSensors"]),
         .library(name: "ContrailEstimator", targets: ["ContrailEstimator"]),
         .library(name: "ContrailLog", targets: ["ContrailLog"]),
+        .library(name: "ContrailData", targets: ["ContrailData"]),
+        .executable(name: "contrail-prep", targets: ["ContrailPrep"]),
     ],
     targets: [
         // MARK: - Libraries (Foundation only — no UIKit/SwiftUI, no Apple sensor
@@ -46,6 +48,18 @@ let package = Package(
             dependencies: ["ContrailCore"]
         ),
 
+        .target(
+            name: "ContrailData",
+            dependencies: ["ContrailCore", "ContrailGeo"]
+        ),
+
+        // MARK: - Dataset compiler (macOS CLI only; not shipped in the app)
+
+        .executableTarget(
+            name: "ContrailPrep",
+            dependencies: ["ContrailCore", "ContrailData"]
+        ),
+
         // MARK: - Tests
 
         .testTarget(name: "ContrailCoreTests", dependencies: ["ContrailCore"]),
@@ -58,6 +72,14 @@ let package = Package(
         .testTarget(
             name: "ContrailLogTests",
             dependencies: ["ContrailLog", "ContrailCore", "ContrailGeo", "ContrailSensors", "ContrailEstimator"]
+        ),
+        .testTarget(
+            name: "ContrailDataTests",
+            dependencies: ["ContrailData", "ContrailCore", "ContrailGeo"]
+        ),
+        .testTarget(
+            name: "ContrailPrepTests",
+            dependencies: ["ContrailPrep", "ContrailData", "ContrailCore"]
         ),
     ],
     swiftLanguageModes: [.v6]
