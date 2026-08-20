@@ -17,6 +17,7 @@ let package = Package(
         .library(name: "ContrailCore", targets: ["ContrailCore"]),
         .library(name: "ContrailGeo", targets: ["ContrailGeo"]),
         .library(name: "ContrailSensors", targets: ["ContrailSensors"]),
+        .library(name: "ContrailEstimator", targets: ["ContrailEstimator"]),
     ],
     targets: [
         // MARK: - Libraries (Foundation only — no UIKit/SwiftUI, no Apple sensor
@@ -34,11 +35,20 @@ let package = Package(
             dependencies: ["ContrailCore", "ContrailGeo"]
         ),
 
+        .target(
+            name: "ContrailEstimator",
+            dependencies: ["ContrailCore", "ContrailGeo", "ContrailSensors"]
+        ),
+
         // MARK: - Tests
 
         .testTarget(name: "ContrailCoreTests", dependencies: ["ContrailCore"]),
         .testTarget(name: "ContrailGeoTests", dependencies: ["ContrailGeo"]),
         .testTarget(name: "ContrailSensorsTests", dependencies: ["ContrailSensors", "ContrailGeo"]),
+        .testTarget(
+            name: "ContrailEstimatorTests",
+            dependencies: ["ContrailEstimator", "ContrailSensors", "ContrailGeo", "ContrailCore"]
+        ),
     ],
     swiftLanguageModes: [.v6]
 )

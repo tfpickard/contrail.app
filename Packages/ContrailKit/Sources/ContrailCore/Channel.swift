@@ -41,14 +41,14 @@ public struct Channel<Value: Sendable & Codable & Equatable>: Sendable, Equatabl
     public let value: Value?
     public let source: ChannelSource
     /// Seconds since the underlying observation was made, at the time this
-    /// `EstimatorOutput` was produced. `nil` when `value` is `nil`.
+    /// `EstimatorOutput` was produced. Optional independent of `value` — a producer
+    /// may report a value with no staleness metadata at all (most of
+    /// `ContrailEstimator`'s derived channels do exactly this), so `age` is not
+    /// required to correlate with whether `value` is present; by convention it is
+    /// `nil` when `value` is `nil`, but that is guidance, not an enforced invariant.
     public let age: TimeInterval?
 
     public init(value: Value?, source: ChannelSource, age: TimeInterval? = nil) {
-        precondition(
-            (value == nil) == (age == nil) || value == nil,
-            "age should only be set when value is present"
-        )
         self.value = value
         self.source = source
         self.age = age

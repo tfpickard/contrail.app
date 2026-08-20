@@ -25,6 +25,11 @@ public struct FlightPlan: Sendable, Equatable {
     /// `GreatCircleTrack`'s documented rationale.
     public let totalDistance: Double
 
+    /// Initial bearing of the geodesic from `origin` to `destination`, degrees true.
+    /// Stored once at init — `position(atAlongTrackDistance:)` reuses it rather than
+    /// re-solving the inverse problem on every dead-reckoning update.
+    public let initialBearing: Double
+
     public var scheduledBlockTime: TimeInterval {
         scheduledArrival.timeIntervalSince(scheduledDeparture)
     }
@@ -45,7 +50,20 @@ public struct FlightPlan: Sendable, Equatable {
         self.scheduledArrival = scheduledArrival
         self.aircraftICAOType = aircraftICAOType
         self.aircraftRegistration = aircraftRegistration
-        self.totalDistance = try VincentyGeodesic.inverse(from: origin, to: destination).distance
+        let route = try VincentyGeodesic.inverse(from: origin, to: destination)
+        self.totalDistance = route.distance
+        self.initialBearing = route.initialBearing
+    }
+
+    /// The point on the origin→destination geodesic at the given along-track
+    /// distance from `origin`. **Exact**, not an approximation — the geodesic direct
+    /// problem, starting at the same initial bearing recorded above, traces the true
+    /// curving route (see `SyntheticFlightLog`'s doc comment for why this is exact
+    /// and not a rhumb line). This is what dead reckoning (§2.3) propagates along:
+    /// the aircraft is assumed to continue on the filed route at the last known
+    /// groundspeed, not to fly off on an extrapolated tangent.
+    public func position(atAlongTrackDistance distance: Double) throws -> Coordinate {
+        try VincentyGeodesic.direct(from: origin, initialBearing: initialBearing, distance: distance).destination
     }
 
     /// This position's geometry relative to the filed great-circle route: signed

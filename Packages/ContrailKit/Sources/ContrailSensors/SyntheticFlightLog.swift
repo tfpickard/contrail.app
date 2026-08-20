@@ -9,12 +9,12 @@ import ContrailGeo
 /// dead-reckoning verification, and (once the App target exists) a bundled on-device
 /// demo log written once at build time.
 ///
-/// The generated ground track follows a **constant initial bearing** from origin to
-/// destination — a rhumb-line approximation, not the true curving geodesic — which
-/// diverges from the real great circle by at most a few km on a flight this length.
-/// That is immaterial for a synthetic test fixture and dramatically simpler than
-/// stepping along the true geodesic; `ContrailGeo`'s own geodesic math, which this
-/// data exists to exercise, is exact regardless of how the fixture was generated.
+/// The generated ground track is placed via the geodesic **direct** problem, walking
+/// increasing along-track distance from `origin` at its initial bearing to
+/// `destination`. That traces the true curving geodesic exactly — not a
+/// constant-compass-bearing rhumb line — landing precisely at `destination` when the
+/// along-track distance reaches the route's total length (validated by
+/// `VincentyGeodesicTests.directIsInverseOfInverse`).
 public enum SyntheticFlightLog {
     public struct Configuration: Sendable {
         public var origin: Coordinate
@@ -107,7 +107,7 @@ public enum SyntheticFlightLog {
         // but directionally correct pressurization schedule.
         func cabinPressureKPa(at t: TimeInterval) -> Double {
             let cabinAltitude = min(altitude(at: t), 2400) // metres, capped cabin altitude
-            return isaPressureKPa(altitude: cabinAltitude)
+            return ISAAtmosphere.pressureKPa(altitude: cabinAltitude)
         }
 
         var samples: [RawSensorSample] = []
@@ -115,7 +115,7 @@ public enum SyntheticFlightLog {
         var previousLocationTime = 0.0
 
         // Location samples: numerically integrate groundspeed to get along-track
-        // distance, then place the point via constant-bearing direct().
+        // distance, then place the point via the geodesic direct problem.
         var t = 0.0
         while t <= totalDuration {
             let dt = t - previousLocationTime
@@ -176,16 +176,5 @@ public enum SyntheticFlightLog {
         }
 
         return samples.sorted { $0.timestamp < $1.timestamp }
-    }
-
-    /// ISA barometric formula, troposphere (below 11 km): P = P0 * (1 - L*h/T0)^(g*M/(R*L)).
-    private static func isaPressureKPa(altitude h: Double) -> Double {
-        let P0 = 101.325   // kPa, sea-level standard pressure
-        let T0 = 288.15    // K, sea-level standard temperature
-        let L = 0.0065     // K/m, temperature lapse rate
-        let g = 9.80665    // m/s²
-        let M = 0.0289644  // kg/mol, molar mass of air
-        let R = 8.3144598   // J/(mol·K)
-        return P0 * pow(1 - (L * h) / T0, (g * M) / (R * L))
     }
 }
