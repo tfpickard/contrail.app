@@ -41,4 +41,31 @@ public final class ChannelStatisticsTracker {
     public func statistics(for window: StatisticsWindow) -> ChannelWindowStatistics {
         trackers[window]!.statistics
     }
+
+    /// All four windows' statistics at once — the natural shape for a UI that lets
+    /// the user switch between them without re-querying per selection.
+    public var allWindowStatistics: AllWindowStatistics {
+        AllWindowStatistics(
+            oneMinute: statistics(for: .oneMinute),
+            fiveMinutes: statistics(for: .fiveMinutes),
+            thirtyMinutes: statistics(for: .thirtyMinutes),
+            wholeFlight: statistics(for: .wholeFlight)
+        )
+    }
+}
+
+public struct AllWindowStatistics: Sendable, Equatable {
+    public let oneMinute: ChannelWindowStatistics
+    public let fiveMinutes: ChannelWindowStatistics
+    public let thirtyMinutes: ChannelWindowStatistics
+    public let wholeFlight: ChannelWindowStatistics
+
+    public subscript(window: StatisticsWindow) -> ChannelWindowStatistics {
+        switch window {
+        case .oneMinute: return oneMinute
+        case .fiveMinutes: return fiveMinutes
+        case .thirtyMinutes: return thirtyMinutes
+        case .wholeFlight: return wholeFlight
+        }
+    }
 }

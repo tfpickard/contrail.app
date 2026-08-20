@@ -14,6 +14,12 @@ actor FlightEstimationEngine {
     private let estimator: Estimator
     private let source: any SensorSource
     private let uiUpdateInterval: TimeInterval
+    /// Fed on *every* estimator output, at full sensor rate — §2.4's statistics
+    /// engine needs the real sample stream, not the throttled UI snapshot. Only the
+    /// computed `snapshot` (cheap: reading cached scalars out of each tracker's four
+    /// windows, no rescanning) crosses out to the UI, and only at the throttled
+    /// cadence alongside `onUpdate`.
+    private let statistics = FlightStatisticsCollector()
 
     init(
         flightPlan: FlightPlan,
@@ -28,7 +34,8 @@ actor FlightEstimationEngine {
 
     /// Runs until the underlying sensor stream ends or the calling task is
     /// cancelled. `onUpdate` fires at most once per `uiUpdateInterval`, even though
-    /// `estimator.ingest` itself runs at full sensor rate underneath.
+    /// `estimator.ingest` (and the statistics collector) run at full sensor rate
+    /// underneath.
     ///
     /// `onUpdate` is `@MainActor`-isolated rather than a plain `@Sendable` closure
     /// bounced through a second `Task { @MainActor in }` at the call site — an
@@ -38,16 +45,17 @@ actor FlightEstimationEngine {
     /// only ever run on the actor it's isolated to. That sidesteps the awkward
     /// doubly-nested `Task { [weak self] in Task { @MainActor [weak self] in ... } }`
     /// this replaced, which fought the Swift 6 checker for no real benefit.
-    func run(onUpdate: @escaping @MainActor @Sendable (EstimatorOutput) -> Void) async {
+    func run(onUpdate: @escaping @MainActor @Sendable (EstimatorOutput, FlightStatisticsSnapshot) -> Void) async {
         var lastEmit = Date.distantPast
         for await sample in source.samples() {
             if Task.isCancelled { return }
             guard let output = estimator.ingest(sample) else { continue }
+            statistics.ingest(output)
 
             let now = Date()
             guard now.timeIntervalSince(lastEmit) >= uiUpdateInterval else { continue }
             lastEmit = now
-            await onUpdate(output)
+            await onUpdate(output, statistics.snapshot)
         }
     }
 }

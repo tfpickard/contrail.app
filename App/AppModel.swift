@@ -30,6 +30,7 @@ final class AppModel {
 
     private(set) var flightPlan: FlightPlan?
     private(set) var latestOutput: EstimatorOutput?
+    private(set) var latestStatistics: FlightStatisticsSnapshot?
     private(set) var isFlightActive = false
     private(set) var lastLogError: String?
 
@@ -83,8 +84,8 @@ final class AppModel {
         }
 
         runTask = Task {
-            await engine.run { [weak self] output in
-                self?.handle(output)
+            await engine.run { [weak self] output, statistics in
+                self?.handle(output, statistics)
             }
         }
     }
@@ -99,8 +100,9 @@ final class AppModel {
         isFlightActive = false
     }
 
-    private func handle(_ output: EstimatorOutput) {
+    private func handle(_ output: EstimatorOutput, _ statistics: FlightStatisticsSnapshot) {
         latestOutput = output
+        latestStatistics = statistics
         do {
             try logWriter?.append(LogRecord(output: output))
         } catch {

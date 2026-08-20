@@ -30,6 +30,8 @@ targets:
         product: ContrailLog
       - package: ContrailKit
         product: ContrailData
+      - package: ContrailKit
+        product: ContrailStatistics
     info:
       path: Generated/Info.plist
       properties:
