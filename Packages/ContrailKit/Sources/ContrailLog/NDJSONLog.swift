@@ -2,10 +2,17 @@ import Foundation
 
 /// §6: "newline-delimited JSON, append-only... line-oriented and append-safe so that
 /// a crash, a thermal shutdown, or a dead battery mid-flight costs at most the last
-/// line, not the flight." One writer per open flight log; not `Sendable` — like
-/// `Estimator`, meant for single-writer use from whichever queue is producing
-/// `EstimatorOutput`s.
-public final class NDJSONLogWriter {
+/// line, not the flight." One writer per open flight log, meant for single-writer
+/// use from whichever queue is producing `EstimatorOutput`s — like `Estimator`.
+///
+/// `@unchecked Sendable`: this is the "construct once, hand off exclusive ownership
+/// once, then never touch it again" pattern, not genuine concurrent access. A caller
+/// typically constructs this on one isolation domain (e.g. `@MainActor`, to resolve
+/// the file URL) and immediately hands it to another (e.g. an actor that owns its
+/// full write lifecycle) — that one-time transfer is safe; two domains writing to it
+/// *concurrently* would not be, and nothing about this type enforces that beyond
+/// convention. Don't retain a reference on both sides of a handoff.
+public final class NDJSONLogWriter: @unchecked Sendable {
     private let fileHandle: FileHandle
     private let encoder: JSONEncoder
 

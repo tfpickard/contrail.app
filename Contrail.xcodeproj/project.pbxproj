@@ -18,6 +18,7 @@
 		6000E0C5A8825F68E2809AEF /* airports.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3B442355D4151A2012D0EAFC /* airports.bin */; };
 		6E8FE6B4D6C5148B08FD465E /* ContrailSensors in Frameworks */ = {isa = PBXBuildFile; productRef = 2030282CE29197AB5A231805 /* ContrailSensors */; };
 		89E85BF6DC6EA71A126D753D /* ContrailData in Frameworks */ = {isa = PBXBuildFile; productRef = 2BCC1B63BEF7B2289F64110C /* ContrailData */; };
+		991A8344CFD72B4E0D4C75CC /* TurbulenceSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = E147F73C3B78D2328C3F69DE /* TurbulenceSurface.swift */; };
 		9E5A9988A469457DCC19AB90 /* LiveSensorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442A28D04C1008537AC81CA2 /* LiveSensorSource.swift */; };
 		A3DBB30879E60F3F1E68CCBE /* ContrailCore in Frameworks */ = {isa = PBXBuildFile; productRef = 974623BF2557F7C33C2857F2 /* ContrailCore */; };
 		AC68838F48FB4FE41C8D3378 /* FixQualitySurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9483514C6130E773BF9DCC8D /* FixQualitySurface.swift */; };
@@ -42,6 +43,7 @@
 		B5E3803EA2564DB77774A44C /* FlightStatisticsCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightStatisticsCollector.swift; sourceTree = "<group>"; };
 		C44E38FBE9310E5BC6FCDE49 /* StatisticsSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsSurface.swift; sourceTree = "<group>"; };
 		CFAD5055A636A01AD695A52B /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		E147F73C3B78D2328C3F69DE /* TurbulenceSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceSurface.swift; sourceTree = "<group>"; };
 		F54924CA940EAF7266C0DEA0 /* ContrailApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContrailApp.swift; sourceTree = "<group>"; };
 		F5E17A4438C2266045DFD0DD /* FlightEstimationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightEstimationEngine.swift; sourceTree = "<group>"; };
 		F7A1C45D2E63AE3BCB4B86D8 /* AdaptiveRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveRoot.swift; sourceTree = "<group>"; };
@@ -80,6 +82,7 @@
 				6B51143711397BB51CB83074 /* MetricsSurface.swift */,
 				9F2B3331A61A641CF72F9116 /* PreFlightSurface.swift */,
 				C44E38FBE9310E5BC6FCDE49 /* StatisticsSurface.swift */,
+				E147F73C3B78D2328C3F69DE /* TurbulenceSurface.swift */,
 			);
 			path = Surfaces;
 			sourceTree = "<group>";
@@ -240,6 +243,7 @@
 				4DBA6CBAFC8C54606AA4EE25 /* MetricsSurface.swift in Sources */,
 				3013398A2E9537D2D29A26A1 /* PreFlightSurface.swift in Sources */,
 				512C26A1AAE42FDC906756CA /* StatisticsSurface.swift in Sources */,
+				991A8344CFD72B4E0D4C75CC /* TurbulenceSurface.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

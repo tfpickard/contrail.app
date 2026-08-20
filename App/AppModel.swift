@@ -36,7 +36,6 @@ final class AppModel {
 
     private var engine: FlightEstimationEngine?
     private var runTask: Task<Void, Never>?
-    private var logWriter: NDJSONLogWriter?
 
     /// Loads and verifies the bundled datasets. Called once at launch — the
     /// pre-flight screen reads `airportAssetStatus`/`placeAssetStatus` directly
@@ -75,18 +74,29 @@ final class AppModel {
         let noPlaceLookup: @Sendable (Coordinate) -> BearingToPlace? = { _ in nil }
         let nearestPlace = placeIndex?.nearestPlaceLookup() ?? noPlaceLookup
         let source = LiveSensorSource()
-        let engine = FlightEstimationEngine(flightPlan: plan, source: source, nearestPlace: nearestPlace)
-        self.engine = engine
 
-        logWriter = try? makeLogWriter(for: plan)
-        if logWriter == nil {
+        // Constructed here, handed off once, and never touched by AppModel again --
+        // the engine owns its full lifecycle (see FlightEstimationEngine.run's own
+        // doc comment on why two isolation domains must not share this instance).
+        let writer = try? makeLogWriter(for: plan)
+        if writer == nil {
             lastLogError = "Could not open a log file for this flight."
         }
 
+        let engine = FlightEstimationEngine(
+            flightPlan: plan, source: source, nearestPlace: nearestPlace, logWriter: writer
+        )
+        self.engine = engine
+
         runTask = Task {
-            await engine.run { [weak self] output, statistics in
-                self?.handle(output, statistics)
-            }
+            await engine.run(
+                onUpdate: { [weak self] output, statistics in
+                    self?.handle(output, statistics)
+                },
+                onLogError: { [weak self] message in
+                    self?.lastLogError = message
+                }
+            )
         }
     }
 
@@ -94,20 +104,12 @@ final class AppModel {
         runTask?.cancel()
         runTask = nil
         engine = nil
-        try? logWriter?.flush()
-        try? logWriter?.close()
-        logWriter = nil
         isFlightActive = false
     }
 
     private func handle(_ output: EstimatorOutput, _ statistics: FlightStatisticsSnapshot) {
         latestOutput = output
         latestStatistics = statistics
-        do {
-            try logWriter?.append(LogRecord(output: output))
-        } catch {
-            lastLogError = "Log write failed: \(error)"
-        }
     }
 
     /// §6: one NDJSON file per flight, in the app's Documents directory. iCloud

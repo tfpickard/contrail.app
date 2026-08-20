@@ -6,7 +6,7 @@ import SwiftUI
 /// either side, never a separate iPad-only or iPhone-only view.
 ///
 /// The map surface (§5.2/§8) isn't built yet — MapLibre isn't wired in this pass —
-/// so this composes the four surfaces that exist today. When the map lands, it
+/// so this composes the five surfaces that exist today. When the map lands, it
 /// takes the primary/detail slot without restructuring this rule.
 struct AdaptiveRoot: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -29,6 +29,8 @@ private struct CompactDashboard: View {
                 .tabItem { Label("Metrics", systemImage: "gauge") }
             NavigationStack { StatisticsSurface() }
                 .tabItem { Label("Stats", systemImage: "chart.bar") }
+            NavigationStack { TurbulenceSurface() }
+                .tabItem { Label("Turbulence", systemImage: "waveform.path.ecg") }
             NavigationStack { FixQualitySurface() }
                 .tabItem { Label("Fix", systemImage: "location") }
         }
@@ -40,6 +42,7 @@ private struct RegularDashboard: View {
         case flight = "Flight"
         case metrics = "Metrics"
         case statistics = "Statistics"
+        case turbulence = "Turbulence"
         case fix = "Fix Quality"
         var id: String { rawValue }
     }
@@ -57,6 +60,7 @@ private struct RegularDashboard: View {
             case .flight: PreFlightSurface()
             case .metrics: MetricsSurface()
             case .statistics: StatisticsSurface()
+            case .turbulence: TurbulenceSurface()
             case .fix: FixQualitySurface()
             case nil: ContentUnavailableView("Select a Surface", systemImage: "sidebar.left")
             }
