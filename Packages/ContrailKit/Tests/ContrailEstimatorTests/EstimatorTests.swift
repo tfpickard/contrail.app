@@ -227,4 +227,55 @@ struct EstimatorTests {
         ))
         #expect(estimator.ingest(motionOnly) == nil)
     }
+
+    // MARK: - Turbulence (§4.1), real as of this module wiring it in.
+
+    @Test func turbulenceChannelIsPopulatedNotUnavailable() throws {
+        let plan = try makeFlightPlan()
+        let estimator = Estimator(flightPlan: plan, motionSampleRateHz: 50)
+
+        var config = SyntheticFlightLog.Configuration(origin: den, destination: lax, departureTime: departure)
+        config.locationSampleInterval = 5
+        config.motionSampleInterval = 1.0 / 50.0 // match the estimator's configured rate
+        config.pressureSampleInterval = 30
+        let samples = try SyntheticFlightLog.generate(config)
+
+        var sawPopulatedEDR = false
+        var sawGateOpen = false
+        for sample in samples {
+            guard let output = estimator.ingest(sample) else { continue }
+            if output.turbulence.edrCubeRoot.value != nil { sawPopulatedEDR = true }
+            if output.turbulence.attitudeGateOpen.value == true { sawGateOpen = true }
+            if sawPopulatedEDR && sawGateOpen { break }
+        }
+
+        // The synthetic log holds a constant level attitude throughout (see
+        // SyntheticFlightLog's motion generator), so the gate should never close,
+        // and the small deterministic wobble it injects should be enough for the
+        // primary band-pass + RMS chain to produce a real (if small) EDR value --
+        // proving the wiring actually flows data, not just that the field exists.
+        #expect(sawGateOpen)
+        #expect(sawPopulatedEDR)
+    }
+
+    @Test func filteredVerticalAccelerationIsExposedForBurstDetection() throws {
+        let plan = try makeFlightPlan()
+        let estimator = Estimator(flightPlan: plan, motionSampleRateHz: 50)
+
+        var config = SyntheticFlightLog.Configuration(origin: den, destination: lax, departureTime: departure)
+        config.locationSampleInterval = 5
+        config.motionSampleInterval = 1.0 / 50.0
+        config.pressureSampleInterval = 30
+        let samples = try SyntheticFlightLog.generate(config)
+
+        var sawNonNilFilteredValue = false
+        for sample in samples {
+            estimator.ingest(sample)
+            if estimator.latestFilteredVerticalAcceleration != nil {
+                sawNonNilFilteredValue = true
+                break
+            }
+        }
+        #expect(sawNonNilFilteredValue)
+    }
 }

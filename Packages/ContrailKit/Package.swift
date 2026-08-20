@@ -42,7 +42,7 @@ let package = Package(
 
         .target(
             name: "ContrailEstimator",
-            dependencies: ["ContrailCore", "ContrailGeo", "ContrailSensors"]
+            dependencies: ["ContrailCore", "ContrailGeo", "ContrailSensors", "ContrailTurbulence"]
         ),
 
         .target(
@@ -59,7 +59,7 @@ let package = Package(
 
         .target(
             name: "ContrailTurbulence",
-            dependencies: ["ContrailSensors"]
+            dependencies: ["ContrailCore", "ContrailSensors"]
         ),
 
         // MARK: - Dataset compiler (macOS CLI only; not shipped in the app)
@@ -96,7 +96,7 @@ let package = Package(
         ),
         .testTarget(
             name: "ContrailTurbulenceTests",
-            dependencies: ["ContrailTurbulence", "ContrailSensors"]
+            dependencies: ["ContrailTurbulence", "ContrailSensors", "ContrailCore"]
         ),
     ],
     swiftLanguageModes: [.v6]

@@ -2,6 +2,7 @@ import Foundation
 import ContrailCore
 import ContrailGeo
 import ContrailSensors
+import ContrailTurbulence
 
 /// §2.3: consumes the raw sensor stream and produces the single fused
 /// `EstimatorOutput` — the contract everything downstream depends on.
@@ -43,6 +44,11 @@ public final class Estimator {
 
     private var latestPhase: FlightPhase?
 
+    // MARK: - Turbulence (§4.1)
+
+    private let turbulenceEstimator: TurbulenceEstimator
+    private var latestTurbulenceSample: TurbulenceSample?
+
     public private(set) var latestOutput: EstimatorOutput?
 
     /// - Parameters:
@@ -53,12 +59,18 @@ public final class Estimator {
     ///     only how to query one. Defaults to always-unavailable, matching `Channel`'s
     ///     "no producer in this build" convention for any caller that hasn't wired a
     ///     dataset in yet.
+    ///   - motionSampleRateHz: the device-motion delivery rate — §3's own stated
+    ///     50-100 Hz range, defaulting to the low end. `TurbulenceEstimator`'s
+    ///     band-pass filters are designed against this rate; passing the wrong value
+    ///     silently shifts every cutoff frequency.
     public init(
         flightPlan: FlightPlan,
-        nearestPlace: @escaping @Sendable (Coordinate) -> BearingToPlace? = { _ in nil }
+        nearestPlace: @escaping @Sendable (Coordinate) -> BearingToPlace? = { _ in nil },
+        motionSampleRateHz: Double = 50.0
     ) {
         self.flightPlan = flightPlan
         self.nearestPlace = nearestPlace
+        self.turbulenceEstimator = TurbulenceEstimator(sampleRateHz: motionSampleRateHz)
     }
 
     /// Feeds one raw sample and returns the freshly recomputed output. Returns `nil`
@@ -72,6 +84,7 @@ public final class Estimator {
             updateLocation(location)
         case .motion(let motion):
             latestMotion = motion
+            latestTurbulenceSample = turbulenceEstimator.ingest(motion)
         case .pressure(let pressure):
             updatePressure(pressure)
         }
@@ -80,6 +93,15 @@ public final class Estimator {
         let output = recomputeOutput(at: sample.timestamp)
         latestOutput = output
         return output
+    }
+
+    /// The instantaneous (not RMS-smoothed) filtered vertical acceleration, `nil`
+    /// while the attitude gate is closed. Not part of `EstimatorOutput`'s schema —
+    /// this is raw DSP detail for `AdaptiveLoggingController`'s burst detection
+    /// (§3), which needs a fast-reacting signal `EstimatorOutput.turbulence`'s
+    /// RMS-smoothed `edrCubeRoot` is deliberately too slow to serve.
+    public var latestFilteredVerticalAcceleration: Double? {
+        latestTurbulenceSample?.filteredVerticalAcceleration
     }
 
     // MARK: - Location updates
@@ -146,9 +168,21 @@ public final class Estimator {
             position: position,
             motion: motion,
             cabin: cabin,
-            turbulence: .unavailable, // 1.2
+            turbulence: assembleTurbulence(),
             route: route,
             phase: phase
+        )
+    }
+
+    /// §4.1's measured turbulence, real as of 1.2 — `forecastEdrCubeRoot` stays
+    /// `.unavailable` until 1.6's GTG comparison lands; the schema has carried that
+    /// field since 1.0 specifically so this moment needs no migration.
+    private func assembleTurbulence() -> TurbulenceEstimate {
+        guard let sample = latestTurbulenceSample else { return .unavailable }
+        return TurbulenceEstimate(
+            edrCubeRoot: sample.edrCubeRoot.map { Channel(value: $0, source: .derived) } ?? .unavailable,
+            forecastEdrCubeRoot: .unavailable,
+            attitudeGateOpen: Channel(value: sample.attitudeGateOpen, source: .derived)
         )
     }
 

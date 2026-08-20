@@ -14,6 +14,12 @@ public struct TurbulenceSample: Sendable, Equatable {
     /// measurement. Real turbulence tends to show broadband energy extending into
     /// this band; handling motion concentrated below ~3 Hz mostly doesn't.
     public let discriminatorRMS: Double?
+    /// The instantaneous (not RMS-smoothed) primary-band filtered vertical
+    /// acceleration at this sample. Not a display quantity — §3's adaptive-logging
+    /// burst detector needs a fast-reacting signal, and `edrCubeRoot`'s 2-second RMS
+    /// window would react far too slowly to catch "the leading edge of the event,
+    /// which is the most interesting part."
+    public let filteredVerticalAcceleration: Double?
 }
 
 /// §4.1's measured-turbulence estimator: band-pass filter → attitude gate → RMS →
@@ -69,8 +75,12 @@ public final class TurbulenceEstimator {
         let discriminatorFiltered = discriminatorFilter.process(vertical)
 
         guard gateOpen else {
+            // Handling motion likely contaminates the filtered signal too -- don't
+            // expose it for burst-triggering purposes either, or "pick the phone up"
+            // could itself trigger burst-rate logging.
             return TurbulenceSample(
-                timestamp: sample.timestamp, edrCubeRoot: nil, attitudeGateOpen: false, discriminatorRMS: nil
+                timestamp: sample.timestamp, edrCubeRoot: nil, attitudeGateOpen: false,
+                discriminatorRMS: nil, filteredVerticalAcceleration: nil
             )
         }
 
@@ -81,7 +91,8 @@ public final class TurbulenceEstimator {
             timestamp: sample.timestamp,
             edrCubeRoot: primaryRMSValue * calibrationScale,
             attitudeGateOpen: true,
-            discriminatorRMS: discriminatorRMSValue
+            discriminatorRMS: discriminatorRMSValue,
+            filteredVerticalAcceleration: primaryFiltered
         )
     }
 }
