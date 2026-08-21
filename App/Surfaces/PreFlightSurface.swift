@@ -103,7 +103,7 @@ struct PreFlightSurface: View {
                 aircraftICAOType: aircraftType.isEmpty ? nil : aircraftType.uppercased(),
                 aircraftRegistration: nil
             )
-            model.startFlight(plan)
+            model.startFlight(plan, origin: origin, destination: destination)
         } catch {
             validationError = "Could not compute the route: \(error)"
         }

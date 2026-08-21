@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		053C8642A7DEA91E249B63CD /* FlightLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA73CFBD055EAB710ECDABA2 /* FlightLogStore.swift */; };
+		0DEFCAE33AC97BFD10023CFB /* FlightLogSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = E888B74B5A291CAE43778488 /* FlightLogSurface.swift */; };
 		1844F6F2FDAB726E2AB70D01 /* BundledDatasets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B278DCF25107982400E6398F /* BundledDatasets.swift */; };
 		1D4B8288173F7034F58930C3 /* places.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3FC401ACE05767EEFED1384A /* places.bin */; };
 		2016D95CDEF95A38EBFDDC51 /* AdaptiveRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A1C45D2E63AE3BCB4B86D8 /* AdaptiveRoot.swift */; };
@@ -53,8 +55,10 @@
 		B278DCF25107982400E6398F /* BundledDatasets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledDatasets.swift; sourceTree = "<group>"; };
 		B5E3803EA2564DB77774A44C /* FlightStatisticsCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightStatisticsCollector.swift; sourceTree = "<group>"; };
 		C44E38FBE9310E5BC6FCDE49 /* StatisticsSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsSurface.swift; sourceTree = "<group>"; };
+		CA73CFBD055EAB710ECDABA2 /* FlightLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightLogStore.swift; sourceTree = "<group>"; };
 		CFAD5055A636A01AD695A52B /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		E147F73C3B78D2328C3F69DE /* TurbulenceSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceSurface.swift; sourceTree = "<group>"; };
+		E888B74B5A291CAE43778488 /* FlightLogSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightLogSurface.swift; sourceTree = "<group>"; };
 		F54924CA940EAF7266C0DEA0 /* ContrailApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContrailApp.swift; sourceTree = "<group>"; };
 		F5E17A4438C2266045DFD0DD /* FlightEstimationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightEstimationEngine.swift; sourceTree = "<group>"; };
 		F7A1C45D2E63AE3BCB4B86D8 /* AdaptiveRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveRoot.swift; sourceTree = "<group>"; };
@@ -101,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				9483514C6130E773BF9DCC8D /* FixQualitySurface.swift */,
+				E888B74B5A291CAE43778488 /* FlightLogSurface.swift */,
 				300330A4A4558B9CA3A365CD /* MapSurface.swift */,
 				6B51143711397BB51CB83074 /* MetricsSurface.swift */,
 				9F2B3331A61A641CF72F9116 /* PreFlightSurface.swift */,
@@ -125,6 +130,7 @@
 			children = (
 				B278DCF25107982400E6398F /* BundledDatasets.swift */,
 				F5E17A4438C2266045DFD0DD /* FlightEstimationEngine.swift */,
+				CA73CFBD055EAB710ECDABA2 /* FlightLogStore.swift */,
 				B5E3803EA2564DB77774A44C /* FlightStatisticsCollector.swift */,
 				442A28D04C1008537AC81CA2 /* LiveSensorSource.swift */,
 				8A43C08F1F3B2D04A3D7554E /* PMTilesHTTPServer.swift */,
@@ -282,6 +288,8 @@
 				B7DDBA9C379328650B78F7F4 /* ContrailApp.swift in Sources */,
 				AC68838F48FB4FE41C8D3378 /* FixQualitySurface.swift in Sources */,
 				B78F96DF6620DC4795731171 /* FlightEstimationEngine.swift in Sources */,
+				053C8642A7DEA91E249B63CD /* FlightLogStore.swift in Sources */,
+				0DEFCAE33AC97BFD10023CFB /* FlightLogSurface.swift in Sources */,
 				DB3601E367CDCCAC5DA8472C /* FlightStatisticsCollector.swift in Sources */,
 				9E5A9988A469457DCC19AB90 /* LiveSensorSource.swift in Sources */,
 				C6975FE79E2683F4E939AB8E /* MapSurface.swift in Sources */,

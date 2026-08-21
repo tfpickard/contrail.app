@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 import ContrailCore
 import ContrailGeo
 import ContrailData
@@ -94,7 +95,11 @@ final class AppModel {
         airportIndex?.airport(icao: icao)
     }
 
-    func startFlight(_ plan: FlightPlan) {
+    /// `origin`/`destination` are the resolved `AirportRecord`s the pre-flight form
+    /// looked up, not just the `Coordinate`s `FlightPlan` carries -- the manifest
+    /// (§6: "fully self-describing years later with no network") needs the ICAO/IATA
+    /// codes and elevation that `FlightPlan` deliberately doesn't retain.
+    func startFlight(_ plan: FlightPlan, origin: AirportRecord, destination: AirportRecord) {
         stopFlight()
 
         flightPlan = plan
@@ -105,12 +110,21 @@ final class AppModel {
         let nearestPlace = placeIndex?.nearestPlaceLookup() ?? noPlaceLookup
         let source = LiveSensorSource()
 
+        let directory = try? flightDirectory(for: plan)
+
         // Constructed here, handed off once, and never touched by AppModel again --
         // the engine owns its full lifecycle (see FlightEstimationEngine.run's own
         // doc comment on why two isolation domains must not share this instance).
-        let writer = try? makeLogWriter(for: plan)
+        let writer = directory.flatMap { try? makeLogWriter(for: plan, flightDirectory: $0) }
         if writer == nil {
             lastLogError = "Could not open a log file for this flight."
+        }
+
+        if let directory {
+            writeManifest(
+                flightID: Self.flightID(for: plan), flightDirectory: directory,
+                plan: plan, origin: origin, destination: destination
+            )
         }
 
         let engine = FlightEstimationEngine(
@@ -142,26 +156,140 @@ final class AppModel {
         latestStatistics = statistics
     }
 
-    /// §6: one NDJSON file per flight, in the app's Documents directory. iCloud
+    /// §6: `Flights/<flightID>/`, one directory per flight, in the app's Documents
+    /// directory -- `manifest.json` and `samples.ndjson` both live here. iCloud
     /// replication (§6's "local storage is the source of truth, iCloud is
     /// replication") is 1.0's own scope but not built in this pass — see the
     /// session's own deferral notes; local storage alone is still complete and
     /// crash-safe on its own.
-    private func makeLogWriter(for plan: FlightPlan) throws -> NDJSONLogWriter {
+    private func flightDirectory(for plan: FlightPlan) throws -> URL {
         let documents = try FileManager.default.url(
             for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true
         )
-        let flightsDirectory = documents.appendingPathComponent("Flights", isDirectory: true)
-        try FileManager.default.createDirectory(at: flightsDirectory, withIntermediateDirectories: true)
+        return documents
+            .appendingPathComponent("Flights", isDirectory: true)
+            .appendingPathComponent(Self.flightID(for: plan), isDirectory: true)
+    }
 
-        let dateStamp = ISO8601DateFormatter().string(from: plan.scheduledDeparture).prefix(10)
-        let flightID = "\(plan.flightNumber)-\(dateStamp)"
-        let fileURL = flightsDirectory
-            .appendingPathComponent(flightID, isDirectory: true)
-            .appendingPathComponent("samples.ndjson")
-        try FileManager.default.createDirectory(
-            at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true
+    private func makeLogWriter(for plan: FlightPlan, flightDirectory: URL) throws -> NDJSONLogWriter {
+        try FileManager.default.createDirectory(at: flightDirectory, withIntermediateDirectories: true)
+        return try NDJSONLogWriter(fileURL: flightDirectory.appendingPathComponent("samples.ndjson"))
+    }
+
+    private static func flightID(for plan: FlightPlan) -> String {
+        "\(plan.flightNumber)-\(dateStamp(for: plan.scheduledDeparture))"
+    }
+
+    /// Device-local, not `ISO8601DateFormatter`'s UTC default -- there's no airport
+    /// timezone dataset yet (that's 1.4's job), but the phone's own clock at the gate
+    /// *is* the origin's local time at the moment a flight is started, which is a
+    /// closer match to the manifest's documented "local to origin" than UTC would be.
+    private static func dateStamp(for date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = .current
+        return formatter.string(from: date)
+    }
+
+    /// Best-effort: a missing or unwritable manifest doesn't stop the flight from
+    /// being logged (`samples.ndjson` is the load-bearing artifact), it just leaves
+    /// that flight's log less self-describing later. Surfaced via `lastLogError`
+    /// like any other non-fatal logging problem.
+    private func writeManifest(
+        flightID: String, flightDirectory: URL, plan: FlightPlan,
+        origin: AirportRecord, destination: AirportRecord
+    ) {
+        do {
+            let manifest = FlightManifest(
+                flightID: flightID,
+                app: .init(version: appVersion, build: appBuild, phase: "1.0"),
+                device: .init(model: Self.deviceModelIdentifier(), os: Self.osVersionString()),
+                resolution: .init(provider: "manual", resolvedAt: Date()),
+                flight: .init(
+                    number: plan.flightNumber,
+                    date: Self.dateStamp(for: plan.scheduledDeparture),
+                    origin: Self.airportInfo(from: origin),
+                    destination: Self.airportInfo(from: destination),
+                    scheduled: .init(
+                        departure: plan.scheduledDeparture, arrival: plan.scheduledArrival,
+                        blockTime: plan.scheduledBlockTime
+                    ),
+                    aircraft: .init(icaoType: plan.aircraftICAOType, registration: plan.aircraftRegistration),
+                    filedRoute: nil
+                ),
+                assets: try bundledAssetInfos(),
+                forecast: nil,
+                sensorSource: "live"
+            )
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            try encoder.encode(manifest).write(
+                to: flightDirectory.appendingPathComponent("manifest.json"), options: .atomic
+            )
+        } catch {
+            lastLogError = "Could not write flight manifest: \(error)"
+        }
+    }
+
+    /// No timezone dataset exists yet (that's 1.4's job) -- `timezone: nil` is
+    /// honest absence, not a placeholder.
+    private static func airportInfo(from record: AirportRecord) -> FlightManifest.AirportInfo {
+        .init(
+            icao: record.icao, iata: record.iata, coordinate: record.coordinate,
+            elevation: record.elevationMetres, timezone: nil
         )
-        return try NDJSONLogWriter(fileURL: fileURL)
+    }
+
+    private func bundledAssetInfos() throws -> [FlightManifest.AssetInfo] {
+        let files: [(kind: String, id: String, name: String, ext: String)] = [
+            ("airports", "ourairports-bundled", "airports", "bin"),
+            ("places", "geonames-bundled", "places", "bin"),
+            ("basemap", "contrail-world-z0-6", "basemap-z0-6", "pmtiles"),
+        ]
+        return try files.map { file in
+            let data = try Data(contentsOf: BundledDatasets.assetURL(named: file.name, extension: file.ext))
+            return FlightManifest.AssetInfo(
+                kind: file.kind, id: file.id, bytes: data.count,
+                sha256: Self.sha256Hex(of: data), verified: true
+            )
+        }
+    }
+
+    private static func sha256Hex(of data: Data) -> String {
+        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+    }
+
+    private var appBuild: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
+    }
+
+    private static func osVersionString() -> String {
+        let version = ProcessInfo.processInfo.operatingSystemVersion
+        return "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
+    }
+
+    /// The hardware identifier (e.g. `"iPhone17,1"`), not `UIDevice.current.model`'s
+    /// generic `"iPhone"` -- `uname()`'s `machine` field is the only way to get it
+    /// without importing UIKit. On the Simulator, `uname()` reports the *host Mac's*
+    /// architecture (`"arm64"`) instead, since the simulated app is a native macOS
+    /// process -- confirmed by inspecting a real manifest written from the
+    /// simulator during this session. `SIMULATOR_MODEL_IDENTIFIER` is the
+    /// environment variable Simulator.app sets with the actually-simulated device's
+    /// real hardware identifier, and takes priority when present.
+    private static func deviceModelIdentifier() -> String {
+        if let simulatorModel = ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] {
+            return simulatorModel
+        }
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        return withUnsafeBytes(of: &systemInfo.machine) { rawBuffer in
+            let bytes = rawBuffer.bindMemory(to: UInt8.self)
+            let nullIndex = bytes.firstIndex(of: 0) ?? bytes.count
+            return String(decoding: bytes[..<nullIndex], as: UTF8.self)
+        }
     }
 }

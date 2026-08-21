@@ -11,18 +11,15 @@ enum BundledDatasets {
     }
 
     static func loadAirportIndex() throws -> AirportIndex {
-        try AirportIndex(data: loadResource(named: "airports", extension: "bin"))
+        try AirportIndex(data: Data(contentsOf: assetURL(named: "airports", extension: "bin")))
     }
 
     static func loadPlaceIndex() throws -> PlaceIndex {
-        try PlaceIndex(data: loadResource(named: "places", extension: "bin"))
+        try PlaceIndex(data: Data(contentsOf: assetURL(named: "places", extension: "bin")))
     }
 
     static func basemapURL() throws -> URL {
-        guard let url = Bundle.main.url(forResource: "basemap-z0-6", withExtension: "pmtiles") else {
-            throw LoadError.resourceMissing("basemap-z0-6.pmtiles")
-        }
-        return url
+        try assetURL(named: "basemap-z0-6", extension: "pmtiles")
     }
 
     /// No `subdirectory:` argument — XcodeGen's `resources:` key (a per-target
@@ -30,10 +27,10 @@ enum BundledDatasets {
     /// bundle here; individual resource files land flat at the bundle root
     /// regardless of their source-tree grouping in Xcode. Confirmed against the
     /// actual built `.app` on this session's build host, not assumed.
-    private static func loadResource(named name: String, extension ext: String) throws -> Data {
+    static func assetURL(named name: String, extension ext: String) throws -> URL {
         guard let url = Bundle.main.url(forResource: name, withExtension: ext) else {
             throw LoadError.resourceMissing("\(name).\(ext)")
         }
-        return try Data(contentsOf: url)
+        return url
     }
 }
