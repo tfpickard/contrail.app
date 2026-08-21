@@ -59,18 +59,9 @@ struct TurbulenceSurface: View {
         .navigationTitle("Turbulence")
     }
 
-    /// Approximate light/moderate/severe bands on the same EDR^(1/3) scale airlines
-    /// and pilots use, per §4.1 -- "so the readout maps onto categories people
-    /// already understand." These are the commonly cited thresholds, not a
-    /// derivation specific to this app's uncalibrated measurement.
     private func category(forEDR edr: Double?) -> String {
         guard let edr else { return "—" }
-        switch edr {
-        case ..<0.1: return "Smooth"
-        case 0.1..<0.4: return "Light"
-        case 0.4..<0.7: return "Moderate"
-        default: return "Severe"
-        }
+        return TurbulenceCategory(edrCubeRoot: edr).rawValue
     }
 
     @ViewBuilder

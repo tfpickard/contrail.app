@@ -5,9 +5,9 @@ import SwiftUI
 /// (a trait, not a device idiom) — the same three child views compose differently on
 /// either side, never a separate iPad-only or iPhone-only view.
 ///
-/// Composes eight surfaces: pre-flight, map, metrics, statistics, turbulence, fix
-/// quality, flight log, route intelligence. Same child views on both branches —
-/// only the container differs.
+/// Composes nine surfaces: pre-flight, map, metrics, statistics, turbulence, fix
+/// quality, flight log, route intelligence, camera. Same child views on both
+/// branches — only the container differs.
 struct AdaptiveRoot: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -39,6 +39,8 @@ private struct CompactDashboard: View {
                 .tabItem { Label("Log", systemImage: "doc.text") }
             NavigationStack { RouteIntelligenceSurface() }
                 .tabItem { Label("Route", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
+            NavigationStack { CameraSurface() }
+                .tabItem { Label("Camera", systemImage: "camera") }
         }
     }
 }
@@ -53,6 +55,7 @@ private struct RegularDashboard: View {
         case fix = "Fix Quality"
         case log = "Flight Log"
         case route = "Route"
+        case camera = "Camera"
         var id: String { rawValue }
     }
 
@@ -74,6 +77,7 @@ private struct RegularDashboard: View {
             case .fix: FixQualitySurface()
             case .log: FlightLogSurface()
             case .route: RouteIntelligenceSurface()
+            case .camera: CameraSurface()
             case nil: ContentUnavailableView("Select a Surface", systemImage: "sidebar.left")
             }
         }

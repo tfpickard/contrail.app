@@ -34,10 +34,17 @@ final class AppModel {
     // MARK: - Active flight
 
     private(set) var flightPlan: FlightPlan?
+    private(set) var originAirport: AirportRecord?
+    private(set) var destinationAirport: AirportRecord?
+    private(set) var currentFlightDirectory: URL?
     private(set) var latestOutput: EstimatorOutput?
     private(set) var latestStatistics: FlightStatisticsSnapshot?
     private(set) var isFlightActive = false
     private(set) var lastLogError: String?
+
+    // MARK: - Camera (§7)
+
+    let photoRingBuffer = PhotoRingBuffer()
 
     // MARK: - Route intelligence (§5.3–§5.5)
 
@@ -132,14 +139,18 @@ final class AppModel {
         stopFlight()
 
         flightPlan = plan
+        originAirport = origin
+        destinationAirport = destination
         isFlightActive = true
         lastLogError = nil
+        photoRingBuffer.reset()
 
         let noPlaceLookup: @Sendable (Coordinate) -> BearingToPlace? = { _ in nil }
         let nearestPlace = placeIndex?.nearestPlaceLookup() ?? noPlaceLookup
         let source = LiveSensorSource()
 
         let directory = try? flightDirectory(for: plan)
+        currentFlightDirectory = directory
 
         // Constructed here, handed off once, and never touched by AppModel again --
         // the engine owns its full lifecycle (see FlightEstimationEngine.run's own
@@ -186,6 +197,9 @@ final class AppModel {
         runTask = nil
         engine = nil
         isFlightActive = false
+        originAirport = nil
+        destinationAirport = nil
+        currentFlightDirectory = nil
         routeIntelligence = nil
         onRouteFixes = []
         currentARTCC = nil
@@ -195,6 +209,7 @@ final class AppModel {
     private func handle(_ output: EstimatorOutput, _ statistics: FlightStatisticsSnapshot) {
         latestOutput = output
         latestStatistics = statistics
+        photoRingBuffer.append(output)
 
         guard let routeIntelligence, let position = output.position.fused.value else { return }
         let altitudeMSL = output.position.altitudeGPS.value

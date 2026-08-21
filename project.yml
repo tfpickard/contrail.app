@@ -39,6 +39,8 @@ targets:
         product: ContrailTurbulence
       - package: ContrailKit
         product: ContrailMap
+      - package: ContrailKit
+        product: ContrailPhoto
       - package: MapLibre
         product: MapLibre
     info:
@@ -73,6 +75,11 @@ targets:
         NSMotionUsageDescription: >-
           Contrail uses motion sensors to measure turbulence and detect
           takeoff, climb, cruise, descent, and landing.
+        NSCameraUsageDescription: >-
+          Contrail uses the camera to capture photos automatically tagged
+          with your flight's position, altitude, and route.
+        NSPhotoLibraryAddUsageDescription: >-
+          Contrail saves the photos you take in-app to your Photos library.
     settings:
       base:
         SWIFT_VERSION: "6.0"
