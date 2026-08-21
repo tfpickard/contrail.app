@@ -17,8 +17,60 @@ struct PreFlightSurface: View {
     @State private var scheduledDeparture = Date()
     @State private var scheduledArrival = Date().addingTimeInterval(2 * 3600)
     @State private var validationError: String?
+    @State private var isConfirmingStop = false
 
     var body: some View {
+        Group {
+            if model.isFlightActive {
+                inFlightView
+            } else {
+                preFlightForm
+            }
+        }
+        .navigationTitle("Contrail")
+    }
+
+    /// Shown for the entire flight -- without this, `AppModel.stopFlight()` is
+    /// unreachable from the UI once a flight starts, and the only way to end one is
+    /// to kill the app. `NDJSONLogWriter`'s lifecycle is still owned end-to-end by
+    /// `FlightEstimationEngine` (per its own doc comment); this button just cancels
+    /// the run task, which triggers that engine's own `defer` flush/close.
+    private var inFlightView: some View {
+        Form {
+            if let plan = model.flightPlan {
+                Section("Flight") {
+                    LabeledContent("Flight", value: plan.flightNumber)
+                    if let progress = model.latestOutput?.route.fractionalProgress.value {
+                        LabeledContent("Progress", value: "\(Int((progress * 100).rounded()))%")
+                    }
+                    if let phase = model.latestOutput?.phase.value {
+                        LabeledContent("Phase", value: phase.rawValue.capitalized)
+                    }
+                }
+            }
+
+            if let lastLogError = model.lastLogError {
+                Section {
+                    Label(lastLogError, systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                }
+            }
+
+            Section {
+                Button("Stop Flight", role: .destructive) { isConfirmingStop = true }
+            }
+        }
+        .confirmationDialog(
+            "Stop logging this flight?", isPresented: $isConfirmingStop, titleVisibility: .visible
+        ) {
+            Button("Stop Flight", role: .destructive) { model.stopFlight() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("The log so far is saved. You can review and export it from the Flight Log tab.")
+        }
+    }
+
+    private var preFlightForm: some View {
         Form {
             Section("Assets") {
                 assetRow("Airports", status: model.airportAssetStatus)
@@ -53,7 +105,6 @@ struct PreFlightSurface: View {
                     .disabled(flightNumber.isEmpty || originICAO.isEmpty || destinationICAO.isEmpty)
             }
         }
-        .navigationTitle("Contrail")
     }
 
     @ViewBuilder
