@@ -75,6 +75,8 @@ struct PreFlightSurface: View {
             Section("Assets") {
                 assetRow("Airports", status: model.airportAssetStatus)
                 assetRow("Populated places", status: model.placeAssetStatus)
+                assetRow("Fixes & navaids", status: model.navFixAssetStatus)
+                assetRow("ARTCC boundaries", status: model.artccAssetStatus)
             }
 
             Section("Flight") {

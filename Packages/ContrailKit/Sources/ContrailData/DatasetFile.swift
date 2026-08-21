@@ -9,6 +9,8 @@ enum DatasetFile {
     enum Kind: UInt8 {
         case airports = 0
         case places = 1
+        case navFixes = 2
+        case artccBoundaries = 3
     }
 
     enum FileError: Error, Equatable {

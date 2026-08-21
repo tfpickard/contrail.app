@@ -18,6 +18,17 @@ enum BundledDatasets {
         try PlaceIndex(data: Data(contentsOf: assetURL(named: "places", extension: "bin")))
     }
 
+    /// §5.3: FAA NASR fixes + navaids, compiled from the 28-day CSV subscriber
+    /// files (public domain).
+    static func loadNavFixIndex() throws -> NavFixIndex {
+        try NavFixIndex(data: Data(contentsOf: assetURL(named: "navfixes", extension: "bin")))
+    }
+
+    /// §5.4: FAA NASR ARTCC boundary polygons, same source cycle as `navfixes.bin`.
+    static func loadARTCCBoundaryIndex() throws -> ARTCCBoundaryIndex {
+        try ARTCCBoundaryIndex(data: Data(contentsOf: assetURL(named: "artcc", extension: "bin")))
+    }
+
     static func basemapURL() throws -> URL {
         try assetURL(named: "basemap-z0-6", extension: "pmtiles")
     }

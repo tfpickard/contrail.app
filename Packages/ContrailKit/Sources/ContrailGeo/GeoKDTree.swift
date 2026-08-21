@@ -122,4 +122,51 @@ public struct GeoKDTree<Payload: Sendable>: Sendable {
             distance: geodesic.distance
         )
     }
+
+    /// Every point within `radius` metres of `query` -- §5.5's divert planner needs
+    /// "every reachable airport," not just the closest one. `radius` is converted to
+    /// the equivalent squared ECEF chord distance once, up front, so the search's
+    /// per-node pruning bound is a cheap comparison, not a per-candidate geodesic
+    /// call; Vincenty only runs on points that actually pass the coarse bound.
+    public func within(radius: Double, of query: Coordinate) -> [NearestResult] {
+        let target = ECEFPoint(query)
+        // Chord length for a central angle θ on a unit sphere is 2·sin(θ/2); Earth's
+        // mean radius converts the surface distance `radius` to that angle.
+        let angularRadius = radius / WGS84.meanRadius
+        let chordRadius = 2 * sin(angularRadius / 2)
+        let chordRadiusSq = chordRadius * chordRadius
+
+        var candidates: [(point: ECEFPoint, coordinate: Coordinate, payload: Payload)] = []
+
+        func search(_ node: Node) {
+            guard case let .branch(point, coordinate, payload, axis, left, right) = node else { return }
+
+            if target.squaredDistance(to: point) <= chordRadiusSq {
+                candidates.append((point, coordinate, payload))
+            }
+
+            let delta = target[axis] - point[axis]
+            let nearSide = delta < 0 ? left : right
+            let farSide = delta < 0 ? right : left
+
+            search(nearSide)
+            if delta * delta <= chordRadiusSq {
+                search(farSide)
+            }
+        }
+
+        search(root)
+
+        // Precise distance/bearing (and the final radius cut) via Vincenty, only on
+        // the small candidate set the coarse ECEF bound already narrowed down to.
+        return candidates.compactMap { candidate in
+            guard let geodesic = try? VincentyGeodesic.inverse(from: query, to: candidate.coordinate),
+                  geodesic.distance <= radius
+            else { return nil }
+            return NearestResult(
+                payload: candidate.payload, coordinate: candidate.coordinate,
+                bearing: geodesic.initialBearing, distance: geodesic.distance
+            )
+        }
+    }
 }

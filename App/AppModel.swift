@@ -23,9 +23,13 @@ final class AppModel {
 
     private(set) var airportAssetStatus: AssetStatus = .pending
     private(set) var placeAssetStatus: AssetStatus = .pending
+    private(set) var navFixAssetStatus: AssetStatus = .pending
+    private(set) var artccAssetStatus: AssetStatus = .pending
 
     private var airportIndex: AirportIndex?
     private var placeIndex: PlaceIndex?
+    private var navFixIndex: NavFixIndex?
+    private var artccIndex: ARTCCBoundaryIndex?
 
     // MARK: - Active flight
 
@@ -34,6 +38,15 @@ final class AppModel {
     private(set) var latestStatistics: FlightStatisticsSnapshot?
     private(set) var isFlightActive = false
     private(set) var lastLogError: String?
+
+    // MARK: - Route intelligence (§5.3–§5.5)
+
+    private var routeIntelligence: RouteIntelligenceEngine?
+    /// Computed once at flight start -- the filed route doesn't move, so this
+    /// doesn't need recomputing on every estimator update the way ARTCC/divert do.
+    private(set) var onRouteFixes: [RouteIntelligenceEngine.OnRouteFix] = []
+    private(set) var currentARTCC: ARTCCBoundary?
+    private(set) var divertCandidates: [RouteIntelligenceEngine.DivertCandidate] = []
 
     private var engine: FlightEstimationEngine?
     private var runTask: Task<Void, Never>?
@@ -87,6 +100,22 @@ final class AppModel {
         } catch {
             placeAssetStatus = .failed(String(describing: error))
         }
+
+        do {
+            let index = try BundledDatasets.loadNavFixIndex()
+            navFixIndex = index
+            navFixAssetStatus = .verified(recordCount: index.count)
+        } catch {
+            navFixAssetStatus = .failed(String(describing: error))
+        }
+
+        do {
+            let index = try BundledDatasets.loadARTCCBoundaryIndex()
+            artccIndex = index
+            artccAssetStatus = .verified(recordCount: index.count)
+        } catch {
+            artccAssetStatus = .failed(String(describing: error))
+        }
     }
 
     /// Resolves an ICAO code against the bundled airport index, for the pre-flight
@@ -127,6 +156,14 @@ final class AppModel {
             )
         }
 
+        if let airportIndex, let navFixIndex, let artccIndex {
+            let intelligence = RouteIntelligenceEngine(
+                airportIndex: airportIndex, navFixIndex: navFixIndex, artccIndex: artccIndex, flightPlan: plan
+            )
+            routeIntelligence = intelligence
+            onRouteFixes = intelligence.onRouteFixes()
+        }
+
         let engine = FlightEstimationEngine(
             flightPlan: plan, source: source, nearestPlace: nearestPlace, logWriter: writer
         )
@@ -149,11 +186,22 @@ final class AppModel {
         runTask = nil
         engine = nil
         isFlightActive = false
+        routeIntelligence = nil
+        onRouteFixes = []
+        currentARTCC = nil
+        divertCandidates = []
     }
 
     private func handle(_ output: EstimatorOutput, _ statistics: FlightStatisticsSnapshot) {
         latestOutput = output
         latestStatistics = statistics
+
+        guard let routeIntelligence, let position = output.position.fused.value else { return }
+        let altitudeMSL = output.position.altitudeGPS.value
+        currentARTCC = routeIntelligence.currentARTCC(at: position, altitudeMSL: altitudeMSL)
+        divertCandidates = altitudeMSL.map {
+            routeIntelligence.divertCandidates(at: position, altitudeMSL: $0)
+        } ?? []
     }
 
     /// §6: `Flights/<flightID>/`, one directory per flight, in the app's Documents
@@ -245,6 +293,8 @@ final class AppModel {
             ("airports", "ourairports-bundled", "airports", "bin"),
             ("places", "geonames-bundled", "places", "bin"),
             ("basemap", "contrail-world-z0-6", "basemap-z0-6", "pmtiles"),
+            ("navfixes", "nasr-navfixes-2026-08-06", "navfixes", "bin"),
+            ("artcc", "nasr-artcc-2026-08-06", "artcc", "bin"),
         ]
         return try files.map { file in
             let data = try Data(contentsOf: BundledDatasets.assetURL(named: file.name, extension: file.ext))

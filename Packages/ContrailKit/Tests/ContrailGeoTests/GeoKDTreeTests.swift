@@ -84,4 +84,61 @@ struct GeoKDTreeTests {
             #expect(treeResult == bruteResult, "mismatch at \(query)")
         }
     }
+
+    // §5.5's divert planner needs "every reachable airport within N metres," not
+    // just the closest one. The radius cutoff is derived from real Vincenty
+    // distances computed here, not a hand-guessed real-world estimate -- Ely's
+    // nearest and next-nearest neighbors by great-circle distance aren't the
+    // geographically "obvious" ones (Salt Lake City is actually closer to Ely than
+    // Reno is), so a memorized-distance assumption would have picked the wrong cut.
+    @Test func withinRadiusFindsExactlyThePointsInRangeNoMoreNoLess() throws {
+        let query = Coordinate(latitude: 39.2474, longitude: -114.8887) // Ely itself
+        let distances = try places.map { coordinate, name in
+            (name, try VincentyGeodesic.inverse(from: query, to: coordinate).distance)
+        }.sorted { $0.1 < $1.1 }
+
+        // Cut the radius exactly between the 2nd and 3rd closest place, so the
+        // in-range set is unambiguous regardless of which places those turn out to be.
+        let radius = (distances[1].1 + distances[2].1) / 2
+        let expectedInRange = Set(distances.prefix(2).map(\.0))
+        let expectedOutOfRange = Set(distances.dropFirst(2).map(\.0))
+
+        let tree = GeoKDTree(points: places.map { ($0.0, $0.1) })
+        let results = tree.within(radius: radius, of: query)
+        let names = Set(results.map(\.payload))
+
+        #expect(names == expectedInRange)
+        #expect(names.isDisjoint(with: expectedOutOfRange))
+        for result in results {
+            #expect(result.distance <= radius)
+        }
+    }
+
+    @Test func withinRadiusOfZeroAtAnExactPointReturnsOnlyThatPoint() {
+        let tree = GeoKDTree(points: places.map { ($0.0, $0.1) })
+        let denver = Coordinate(latitude: 39.7392, longitude: -104.9903)
+        let results = tree.within(radius: 1000, of: denver) // 1 km -- effectively "just here"
+        #expect(results.map(\.payload) == ["Denver, Colorado"])
+    }
+
+    @Test func withinRadiusMatchesBruteForceOverManyRandomPoints() {
+        var grid: [(Coordinate, Int)] = []
+        var id = 0
+        for latStep in stride(from: -60, through: 60, by: 7) {
+            for lonStep in stride(from: -170, through: 170, by: 11) {
+                grid.append((Coordinate(latitude: Double(latStep), longitude: Double(lonStep)), id))
+                id += 1
+            }
+        }
+        let tree = GeoKDTree(points: grid)
+        let query = Coordinate(latitude: 39.86, longitude: -104.67)
+        let radius = 2_000_000.0 // 2000 km
+
+        let treeResult = Set(tree.within(radius: radius, of: query).map(\.payload))
+        let bruteResult = Set(grid.compactMap { point -> Int? in
+            let distance = (try? VincentyGeodesic.inverse(from: query, to: point.0).distance) ?? .infinity
+            return distance <= radius ? point.1 : nil
+        })
+        #expect(treeResult == bruteResult)
+    }
 }

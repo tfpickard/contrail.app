@@ -9,6 +9,8 @@ shipping app (an About/Acknowledgments screen — App-target work, not yet built
 |---|---|---|---|
 | Airports | [OurAirports](https://ourairports.com/data/) — `airports.csv` | Public domain | No, but customary |
 | Populated places | [GeoNames](https://www.geonames.org/) — `cities1000` dump | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | **Yes** |
+| Fixes & navaids | [FAA NASR 28-day subscription](https://www.faa.gov/air_traffic/flight_info/aeronav/aero_data/NASR_Subscription/) — `FIX_BASE.csv`, `NAV_BASE.csv` | Public domain (US federal government work) | No |
+| ARTCC boundaries | FAA NASR 28-day subscription — `ARB_BASE.csv`, `ARB_SEG.csv` | Public domain (US federal government work) | No |
 
 ## GeoNames attribution
 
@@ -18,13 +20,26 @@ include:
 > Populated place data © [GeoNames.org](https://www.geonames.org/), licensed under
 > [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
+## NASR data goes stale every 28 days
+
+Unlike the airports/places datasets, FAA NASR publishes a new subscription cycle every
+28 days — fixes, navaids, and ARTCC boundaries do change (new procedures, decommissioned
+navaids, sector realignments). The bundled `navfixes.bin`/`artcc.bin` are a snapshot from
+the cycle effective **2026-08-06**, not a live feed; recompiling from a fresher cycle
+before each app release is a housekeeping task, not a one-time setup step.
+
 ## Compiling
 
 ```
 swift run contrail-prep airports <path to airports.csv> <output airports.bin>
 swift run contrail-prep places <path to cities1000.txt> <output places.bin>
+swift run contrail-prep navfixes <path to FIX_BASE.csv> <path to NAV_BASE.csv> <output navfixes.bin>
+swift run contrail-prep artcc <path to ARB_BASE.csv> <path to ARB_SEG.csv> <output artcc.bin>
 ```
 
 Source files (not checked into this repo — download fresh when recompiling):
 - `https://davidmegginson.github.io/ourairports-data/airports.csv`
 - `https://download.geonames.org/export/dump/cities1000.zip` (unzip first)
+- FAA NASR CSV subscriber files, from the current cycle's page linked above (look for
+  `FIX_CSV.zip`, `NAV_CSV.zip`, and `ARB_CSV.zip` under that cycle's downloads; unzip
+  each to get `FIX_BASE.csv`, `NAV_BASE.csv`, `ARB_BASE.csv`, `ARB_SEG.csv`)

@@ -45,5 +45,12 @@ public struct AirportIndex: Sendable {
         tree.nearest(to: coordinate)?.payload
     }
 
+    /// §5.5's divert planner: every airport within `radius` metres of `coordinate`,
+    /// nearest first. Not itself glide-reach-aware -- the caller narrows this by
+    /// each candidate's own elevation vs. current altitude.
+    public func within(radius: Double, of coordinate: Coordinate) -> [GeoKDTree<AirportRecord>.NearestResult] {
+        tree.within(radius: radius, of: coordinate).sorted { $0.distance < $1.distance }
+    }
+
     public var count: Int { byICAO.count }
 }
