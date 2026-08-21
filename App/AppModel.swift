@@ -5,6 +5,7 @@ import ContrailGeo
 import ContrailData
 import ContrailLog
 import ContrailForecast
+import ContrailIdentity
 
 /// The app's single source of UI-facing state. Owns pre-flight asset verification,
 /// the active flight's `FlightPlan` and live `EstimatorOutput` stream, and the NDJSON
@@ -78,6 +79,47 @@ final class AppModel {
 
     private var engine: FlightEstimationEngine?
     private var runTask: Task<Void, Never>?
+
+    // MARK: - Identity (Phase 2)
+
+    /// The freeform half of a profile -- what the pilot writes about themselves.
+    /// `loadProfile()` populates this at launch; `updateProfile(_:)` is the only
+    /// writer, so every edit is persisted the same way the log/manifest are: to
+    /// local storage, immediately, with no separate "save" step to forget.
+    private(set) var profile: UserProfile = .empty
+    private let profileStore = ProfileStore(directory: AppModel.profileDirectory())
+
+    /// The generated half -- computed from every logged flight, never user-edited.
+    /// Not kept continuously up to date: recomputing means reading every flight's
+    /// full NDJSON log, which is cheap for the handful of flights an early user has
+    /// but not something to redo on every view update, so it's an explicit refresh
+    /// like `FlightLogSurface`'s own `refresh()`.
+    private(set) var generatedProfileStats: GeneratedProfileStats = .empty
+
+    func loadProfile() {
+        profile = profileStore.load()
+    }
+
+    func updateProfile(_ profile: UserProfile) {
+        self.profile = profile
+        try? profileStore.save(profile)
+    }
+
+    func refreshGeneratedProfileStats() {
+        let flights: [GeneratedProfileCompiler.FlightData] = FlightLogStore.listFlights().compactMap { summary in
+            guard let manifest = summary.manifest,
+                  let records = try? FlightLogStore.loadRecords(in: summary.directory) else { return nil }
+            return GeneratedProfileCompiler.FlightData(manifest: manifest, records: records)
+        }
+        generatedProfileStats = GeneratedProfileCompiler.compile(from: flights)
+    }
+
+    private static func profileDirectory() -> URL {
+        let documents = (try? FileManager.default.url(
+            for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true
+        )) ?? FileManager.default.temporaryDirectory
+        return documents.appendingPathComponent("Profile", isDirectory: true)
+    }
 
     // MARK: - Offline basemap (§5.2)
 

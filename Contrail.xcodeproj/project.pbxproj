@@ -18,7 +18,9 @@
 		2A2266B9BCB370D5DFB6610A /* CameraSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19666EECF394EEA28B9FFBB /* CameraSurface.swift */; };
 		2D462A2166E782D006ACA090 /* ForecastCacheBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21367E5E66ED93691C913A25 /* ForecastCacheBox.swift */; };
 		3013398A2E9537D2D29A26A1 /* PreFlightSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2B3331A61A641CF72F9116 /* PreFlightSurface.swift */; };
+		39A54CB29C28C49FF83282DD /* ProfileSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2CDB3F731E5BF665C1FE2C0 /* ProfileSurface.swift */; };
 		4DBA6CBAFC8C54606AA4EE25 /* MetricsSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B51143711397BB51CB83074 /* MetricsSurface.swift */; };
+		4EE0D9F6DEA31E04FCD21C0D /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = BFBF113A1166C5D8ED0BFA35 /* MapLibre */; };
 		4F01D400ED757343B5DD02CC /* ContrailStatistics in Frameworks */ = {isa = PBXBuildFile; productRef = C3C9BCDC07C96F5DCF5649DD /* ContrailStatistics */; };
 		512C26A1AAE42FDC906756CA /* StatisticsSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E38FBE9310E5BC6FCDE49 /* StatisticsSurface.swift */; };
 		5DBDEFEF917E614DAFDB9C8B /* ContrailGeo in Frameworks */ = {isa = PBXBuildFile; productRef = 72ECA25E40918ABF69E71DC6 /* ContrailGeo */; };
@@ -26,6 +28,7 @@
 		6000E0C5A8825F68E2809AEF /* airports.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3B442355D4151A2012D0EAFC /* airports.bin */; };
 		601982C2A4458A784A5772FA /* artcc.bin in Resources */ = {isa = PBXBuildFile; fileRef = FAAB0E0A484C172C3DE2C371 /* artcc.bin */; };
 		6E8FE6B4D6C5148B08FD465E /* ContrailSensors in Frameworks */ = {isa = PBXBuildFile; productRef = 2030282CE29197AB5A231805 /* ContrailSensors */; };
+		74B72154A93C13FC8F1FC280 /* GroupFlightSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CFF8442DC9404701C70551 /* GroupFlightSurface.swift */; };
 		8822FBCDE51E02C81541BB9F /* RouteIntelligence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B8694648B5E7B5466F34A0 /* RouteIntelligence.swift */; };
 		89E85BF6DC6EA71A126D753D /* ContrailData in Frameworks */ = {isa = PBXBuildFile; productRef = 2BCC1B63BEF7B2289F64110C /* ContrailData */; };
 		94216F838C6B3B29F386D28D /* ContrailForecast in Frameworks */ = {isa = PBXBuildFile; productRef = DD1D8207B0D879A0B718D467 /* ContrailForecast */; };
@@ -45,13 +48,14 @@
 		D50AABB67AF5999067B7DBEB /* ContrailMap in Frameworks */ = {isa = PBXBuildFile; productRef = 6C2B9A8AF9300B31255104C5 /* ContrailMap */; };
 		DB3601E367CDCCAC5DA8472C /* FlightStatisticsCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E3803EA2564DB77774A44C /* FlightStatisticsCollector.swift */; };
 		DC70D0DE660345BDFCB8795E /* ContrailPhoto in Frameworks */ = {isa = PBXBuildFile; productRef = C37638BB1BDD3F2282F63A8A /* ContrailPhoto */; };
-		E5F4B453020114477C21BB03 /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = BFBF113A1166C5D8ED0BFA35 /* MapLibre */; };
+		E5F4B453020114477C21BB03 /* ContrailIdentity in Frameworks */ = {isa = PBXBuildFile; productRef = 6BD8FE466A15BF09F07F0DED /* ContrailIdentity */; };
 		EA97E83F98CEADCBF1913D77 /* ContrailEstimator in Frameworks */ = {isa = PBXBuildFile; productRef = BA35708646A97D40EB4307DB /* ContrailEstimator */; };
 		EE161A472B0A1B0C7B513323 /* ContrailLog in Frameworks */ = {isa = PBXBuildFile; productRef = 08F75B0A8BA42893CB144811 /* ContrailLog */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1C29CF0FAA412BFA0035D64F /* basemap-style.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "basemap-style.json"; sourceTree = "<group>"; };
+		20CFF8442DC9404701C70551 /* GroupFlightSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupFlightSurface.swift; sourceTree = "<group>"; };
 		21367E5E66ED93691C913A25 /* ForecastCacheBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastCacheBox.swift; sourceTree = "<group>"; };
 		2FC63C682DFF028E6304FD4E /* PhotoCaptureController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureController.swift; sourceTree = "<group>"; };
 		300330A4A4558B9CA3A365CD /* MapSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSurface.swift; sourceTree = "<group>"; };
@@ -76,6 +80,7 @@
 		C44E38FBE9310E5BC6FCDE49 /* StatisticsSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsSurface.swift; sourceTree = "<group>"; };
 		CA73CFBD055EAB710ECDABA2 /* FlightLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightLogStore.swift; sourceTree = "<group>"; };
 		CFAD5055A636A01AD695A52B /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		D2CDB3F731E5BF665C1FE2C0 /* ProfileSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSurface.swift; sourceTree = "<group>"; };
 		E147F73C3B78D2328C3F69DE /* TurbulenceSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurbulenceSurface.swift; sourceTree = "<group>"; };
 		E888B74B5A291CAE43778488 /* FlightLogSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightLogSurface.swift; sourceTree = "<group>"; };
 		F54924CA940EAF7266C0DEA0 /* ContrailApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContrailApp.swift; sourceTree = "<group>"; };
@@ -100,7 +105,8 @@
 				D50AABB67AF5999067B7DBEB /* ContrailMap in Frameworks */,
 				DC70D0DE660345BDFCB8795E /* ContrailPhoto in Frameworks */,
 				94216F838C6B3B29F386D28D /* ContrailForecast in Frameworks */,
-				E5F4B453020114477C21BB03 /* MapLibre in Frameworks */,
+				E5F4B453020114477C21BB03 /* ContrailIdentity in Frameworks */,
+				4EE0D9F6DEA31E04FCD21C0D /* MapLibre in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,9 +135,11 @@
 				C19666EECF394EEA28B9FFBB /* CameraSurface.swift */,
 				9483514C6130E773BF9DCC8D /* FixQualitySurface.swift */,
 				E888B74B5A291CAE43778488 /* FlightLogSurface.swift */,
+				20CFF8442DC9404701C70551 /* GroupFlightSurface.swift */,
 				300330A4A4558B9CA3A365CD /* MapSurface.swift */,
 				6B51143711397BB51CB83074 /* MetricsSurface.swift */,
 				9F2B3331A61A641CF72F9116 /* PreFlightSurface.swift */,
+				D2CDB3F731E5BF665C1FE2C0 /* ProfileSurface.swift */,
 				61A72C62A1A8B4E616D83886 /* RouteIntelligenceSurface.swift */,
 				C44E38FBE9310E5BC6FCDE49 /* StatisticsSurface.swift */,
 				E147F73C3B78D2328C3F69DE /* TurbulenceSurface.swift */,
@@ -252,6 +260,7 @@
 				6C2B9A8AF9300B31255104C5 /* ContrailMap */,
 				C37638BB1BDD3F2282F63A8A /* ContrailPhoto */,
 				DD1D8207B0D879A0B718D467 /* ContrailForecast */,
+				6BD8FE466A15BF09F07F0DED /* ContrailIdentity */,
 				BFBF113A1166C5D8ED0BFA35 /* MapLibre */,
 			);
 			productName = Contrail;
@@ -328,6 +337,7 @@
 				0DEFCAE33AC97BFD10023CFB /* FlightLogSurface.swift in Sources */,
 				DB3601E367CDCCAC5DA8472C /* FlightStatisticsCollector.swift in Sources */,
 				2D462A2166E782D006ACA090 /* ForecastCacheBox.swift in Sources */,
+				74B72154A93C13FC8F1FC280 /* GroupFlightSurface.swift in Sources */,
 				9E5A9988A469457DCC19AB90 /* LiveSensorSource.swift in Sources */,
 				C6975FE79E2683F4E939AB8E /* MapSurface.swift in Sources */,
 				4DBA6CBAFC8C54606AA4EE25 /* MetricsSurface.swift in Sources */,
@@ -336,6 +346,7 @@
 				20630AAC57EF7E23E2E4BD03 /* PhotoMetadataWriter.swift in Sources */,
 				A7AB1566997C494E9BA95C40 /* PhotoRingBuffer.swift in Sources */,
 				3013398A2E9537D2D29A26A1 /* PreFlightSurface.swift in Sources */,
+				39A54CB29C28C49FF83282DD /* ProfileSurface.swift in Sources */,
 				8822FBCDE51E02C81541BB9F /* RouteIntelligence.swift in Sources */,
 				08529DE03797B41BC6D4BE49 /* RouteIntelligenceSurface.swift in Sources */,
 				512C26A1AAE42FDC906756CA /* StatisticsSurface.swift in Sources */,
@@ -568,6 +579,10 @@
 		2BCC1B63BEF7B2289F64110C /* ContrailData */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ContrailData;
+		};
+		6BD8FE466A15BF09F07F0DED /* ContrailIdentity */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ContrailIdentity;
 		};
 		6C2B9A8AF9300B31255104C5 /* ContrailMap */ = {
 			isa = XCSwiftPackageProductDependency;
