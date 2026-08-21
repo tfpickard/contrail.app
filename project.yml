@@ -43,6 +43,8 @@ targets:
         product: ContrailPhoto
       - package: ContrailKit
         product: ContrailForecast
+      - package: ContrailKit
+        product: ContrailIdentity
       - package: MapLibre
         product: MapLibre
     info:

@@ -25,6 +25,7 @@ let package = Package(
         .library(name: "ContrailMap", targets: ["ContrailMap"]),
         .library(name: "ContrailPhoto", targets: ["ContrailPhoto"]),
         .library(name: "ContrailForecast", targets: ["ContrailForecast"]),
+        .library(name: "ContrailIdentity", targets: ["ContrailIdentity"]),
         .executable(name: "contrail-prep", targets: ["ContrailPrep"]),
     ],
     targets: [
@@ -77,6 +78,16 @@ let package = Package(
             dependencies: ["ContrailCore", "ContrailGeo"]
         ),
 
+        // Phase 2 -- Identity: profiles (freeform + derived-from-history) and group
+        // flight records. Depends on ContrailLog because a "generated" profile is
+        // computed from the same FlightManifest/LogRecord types the logger already
+        // writes, and a group flight record is literally a bundle of those from
+        // multiple participants' phones.
+        .target(
+            name: "ContrailIdentity",
+            dependencies: ["ContrailCore", "ContrailLog"]
+        ),
+
         // MARK: - Dataset compiler (macOS CLI only; not shipped in the app)
 
         .executableTarget(
@@ -125,6 +136,10 @@ let package = Package(
         .testTarget(
             name: "ContrailForecastTests",
             dependencies: ["ContrailForecast", "ContrailCore", "ContrailGeo"]
+        ),
+        .testTarget(
+            name: "ContrailIdentityTests",
+            dependencies: ["ContrailIdentity", "ContrailCore", "ContrailLog"]
         ),
     ],
     swiftLanguageModes: [.v6]
