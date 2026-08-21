@@ -4,6 +4,7 @@ import ContrailCore
 import ContrailGeo
 import ContrailData
 import ContrailLog
+import ContrailForecast
 
 /// The app's single source of UI-facing state. Owns pre-flight asset verification,
 /// the active flight's `FlightPlan` and live `EstimatorOutput` stream, and the NDJSON
@@ -45,6 +46,26 @@ final class AppModel {
     // MARK: - Camera (§7)
 
     let photoRingBuffer = PhotoRingBuffer()
+
+    // MARK: - GTG turbulence forecast (§4.2/§4.3)
+
+    enum ForecastFetchStatus: Equatable {
+        case idle
+        case fetching
+        case succeeded(sampleCount: Int)
+        case failed(String)
+    }
+
+    private(set) var forecastFetchStatus: ForecastFetchStatus = .idle
+    private var forecastCacheBox: ForecastCacheBox?
+
+    /// Persisted directly to `UserDefaults` -- a GribStream account/API token is the
+    /// user's own to create (see `GTGForecastClient`'s own doc comment on why this
+    /// build never creates or embeds one), entered once and reused every flight.
+    var gribStreamAPIToken: String {
+        get { UserDefaults.standard.string(forKey: "gribStreamAPIToken") ?? "" }
+        set { UserDefaults.standard.set(newValue, forKey: "gribStreamAPIToken") }
+    }
 
     // MARK: - Route intelligence (§5.3–§5.5)
 
@@ -175,8 +196,18 @@ final class AppModel {
             onRouteFixes = intelligence.onRouteFixes()
         }
 
+        let forecastBox = ForecastCacheBox()
+        forecastCacheBox = forecastBox
+        if !gribStreamAPIToken.isEmpty {
+            Task { await fetchForecast(for: plan, into: forecastBox) }
+        }
+
         let engine = FlightEstimationEngine(
-            flightPlan: plan, source: source, nearestPlace: nearestPlace, logWriter: writer
+            flightPlan: plan, source: source, nearestPlace: nearestPlace,
+            forecastLookup: { [forecastBox] alongTrackFlown, altitudeMetres, time in
+                forecastBox.value(alongTrackFlown: alongTrackFlown, altitudeMetres: altitudeMetres, time: time)
+            },
+            logWriter: writer
         )
         self.engine = engine
 
@@ -204,6 +235,39 @@ final class AppModel {
         onRouteFixes = []
         currentARTCC = nil
         divertCandidates = []
+        forecastCacheBox = nil
+        forecastFetchStatus = .idle
+    }
+
+    /// §4.2's "pre-flight-side slice," fetched once at flight start while there's
+    /// still connectivity to reach GribStream at all -- the result populates
+    /// `into` (read continuously from `FlightEstimationEngine`'s own actor), not a
+    /// stored property this method returns synchronously, since the whole point is
+    /// that a flight already in progress by the time this completes must not block
+    /// on it.
+    private func fetchForecast(for plan: FlightPlan, into box: ForecastCacheBox) async {
+        forecastFetchStatus = .fetching
+        do {
+            // No actual cruise-altitude input exists in 1.0's manual pre-flight
+            // form -- a fixed, generously-high assumption (FL380) keeps the
+            // fetched level range covering a typical narrow-body cruise without
+            // needing a new form field for this one subphase.
+            let forecastPlan = try RouteForecastPlan(
+                flightPlan: plan, cruiseAltitudeMetres: 11_582,
+                times: [plan.scheduledDeparture, plan.scheduledArrival]
+            )
+            let request = try GTGForecastClient.buildRequest(for: forecastPlan, apiToken: gribStreamAPIToken)
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+                forecastFetchStatus = .failed("Forecast request failed (HTTP \((response as? HTTPURLResponse)?.statusCode ?? -1)).")
+                return
+            }
+            let samples = try GTGForecastClient.parse(data, plan: forecastPlan)
+            box.set(RouteForecastCache(plan: forecastPlan, samples: samples))
+            forecastFetchStatus = .succeeded(sampleCount: samples.count)
+        } catch {
+            forecastFetchStatus = .failed("Could not fetch the turbulence forecast: \(error)")
+        }
     }
 
     private func handle(_ output: EstimatorOutput, _ statistics: FlightStatisticsSnapshot) {

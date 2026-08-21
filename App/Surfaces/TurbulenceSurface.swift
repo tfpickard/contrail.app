@@ -42,11 +42,26 @@ struct TurbulenceSurface: View {
                     }
                 }
 
-                Section("Forecast") {
-                    // 1.6's job -- always unavailable until the GTG comparison
-                    // lands, per the schema's own from-day-one nullable field.
-                    LabeledContent("GTG EDR^(1/3)") { Text("Not available") }
-                        .foregroundStyle(.secondary)
+                Section {
+                    LabeledContent("GTG EDR^(1/3)") {
+                        if let forecast = turbulence.forecastEdrCubeRoot.value {
+                            Text(String(format: "%.3f m^(2/3)/s", forecast))
+                        } else {
+                            Text("Not available")
+                        }
+                    }
+                    if let measured = turbulence.edrCubeRoot.value, let forecast = turbulence.forecastEdrCubeRoot.value {
+                        // §4.3: "the residual" -- positive means worse than forecast.
+                        LabeledContent("Residual (measured − forecast)") {
+                            Text(String(format: "%+.3f m^(2/3)/s", measured - forecast))
+                        }
+                    }
+                } header: {
+                    Text("Forecast")
+                } footer: {
+                    if turbulence.forecastEdrCubeRoot.value == nil {
+                        Text("Enter a GribStream API token on the Flight tab before starting to compare against NOAA's GTG forecast.")
+                    }
                 }
             } else {
                 ContentUnavailableView(

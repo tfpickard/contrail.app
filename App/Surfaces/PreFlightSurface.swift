@@ -49,6 +49,10 @@ struct PreFlightSurface: View {
                 }
             }
 
+            Section("Turbulence Forecast") {
+                forecastStatusRow
+            }
+
             if let lastLogError = model.lastLogError {
                 Section {
                     Label(lastLogError, systemImage: "exclamationmark.triangle.fill")
@@ -95,6 +99,17 @@ struct PreFlightSurface: View {
                 DatePicker("Arrival", selection: $scheduledArrival)
             }
 
+            Section {
+                SecureField("GribStream API token (optional)", text: gribStreamTokenBinding)
+            } footer: {
+                Text(
+                    "§4.2/§4.3: compares measured turbulence against NOAA's GTG "
+                    + "forecast along your route. Requires your own free GribStream "
+                    + "account (gribstream.com) -- left blank, the app logs and "
+                    + "shows measured turbulence only."
+                )
+            }
+
             if let validationError {
                 Section {
                     Label(validationError, systemImage: "exclamationmark.triangle.fill")
@@ -106,6 +121,28 @@ struct PreFlightSurface: View {
                 Button("Start Flight") { startFlight() }
                     .disabled(flightNumber.isEmpty || originICAO.isEmpty || destinationICAO.isEmpty)
             }
+        }
+    }
+
+    private var gribStreamTokenBinding: Binding<String> {
+        Binding(get: { model.gribStreamAPIToken }, set: { model.gribStreamAPIToken = $0 })
+    }
+
+    @ViewBuilder
+    private var forecastStatusRow: some View {
+        switch model.forecastFetchStatus {
+        case .idle:
+            Text(model.gribStreamAPIToken.isEmpty ? "No API token configured." : "Not yet fetched.")
+                .foregroundStyle(.secondary)
+        case .fetching:
+            LabeledContent("Fetching forecast") { ProgressView() }
+        case .succeeded(let count):
+            Label("\(count) forecast points along route", systemImage: "checkmark.circle.fill")
+                .foregroundStyle(.green)
+        case .failed(let message):
+            Label(message, systemImage: "xmark.circle.fill")
+                .foregroundStyle(.red)
+                .lineLimit(2)
         }
     }
 

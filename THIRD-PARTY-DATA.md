@@ -1,5 +1,29 @@
 # Third-party datasets
 
+## GTG turbulence forecast (live API, not a bundled dataset)
+
+§4.2/§4.3's forecast-vs-measured comparison uses [GribStream](https://gribstream.com)'s
+`dafsgtg` model, a mirror of NOAA/NCEP's real DAFS GTG feed with the values already
+decoded from GRIB2 into JSON. This is a deliberate substitute for parsing raw GRIB2
+on-device -- inspecting a real NCEP DAFS GTG file during this build confirmed the spec's
+own prediction ("a rabbit hole"): Lambert Conformal projection, a bitmap, and complex
+packing with second-order spatial differencing, not a decoder to hand-write against a
+single feature's remaining budget.
+
+**This requires your own GribStream account.** Sign up for a free account at
+gribstream.com, generate an API token, and enter it on the Flight tab before starting a
+flight (Turbulence Forecast section). No account or token is bundled with this app --
+creating one is a real account/billing decision that belongs to whoever runs the app,
+not something to embed. Leaving the token blank just means the app logs and shows
+measured turbulence only, same as before this feature existed.
+
+The request-building and response-parsing logic (`ContrailForecast`) is unit-tested
+against fixtures matching GribStream's documented API shape and has been exercised
+against the real live endpoint (confirmed reachable, returning a genuine `401` for an
+invalid token -- i.e. the request format reaches GribStream's auth layer correctly) but
+not yet against a real authenticated response, since that needs an account this build
+doesn't have.
+
 Bundled datasets compiled by `contrail-prep` (`Packages/ContrailKit/Sources/ContrailPrep`)
 from the following upstream sources. Not code dependencies — tracked separately because
 one of them carries a legal attribution requirement that must surface somewhere in the

@@ -35,10 +35,13 @@ actor FlightEstimationEngine {
         flightPlan: FlightPlan,
         source: any SensorSource,
         nearestPlace: @escaping @Sendable (Coordinate) -> BearingToPlace? = { _ in nil },
+        forecastLookup: @escaping @Sendable (Double, Double, Date) -> Double? = { _, _, _ in nil },
         uiUpdateInterval: TimeInterval = 0.1,
         logWriter: NDJSONLogWriter?
     ) {
-        self.estimator = Estimator(flightPlan: flightPlan, nearestPlace: nearestPlace)
+        self.estimator = Estimator(
+            flightPlan: flightPlan, nearestPlace: nearestPlace, forecastLookup: forecastLookup
+        )
         self.source = source
         self.uiUpdateInterval = uiUpdateInterval
         self.logWriter = logWriter

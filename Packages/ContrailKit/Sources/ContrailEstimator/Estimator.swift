@@ -15,6 +15,7 @@ import ContrailTurbulence
 public final class Estimator {
     private let flightPlan: FlightPlan
     private let nearestPlace: @Sendable (Coordinate) -> BearingToPlace?
+    private let forecastLookup: @Sendable (_ alongTrackFlown: Double, _ altitudeMetres: Double, _ time: Date) -> Double?
 
     // MARK: - Raw channel state
 
@@ -63,13 +64,18 @@ public final class Estimator {
     ///     50-100 Hz range, defaulting to the low end. `TurbulenceEstimator`'s
     ///     band-pass filters are designed against this rate; passing the wrong value
     ///     silently shifts every cutoff frequency.
+    ///   - forecastLookup: §4.2/§4.3's GTG comparison -- injected the same way as
+    ///     `nearestPlace`, so `Estimator` stays ignorant of how (or whether) a route
+    ///     forecast was fetched. Defaults to always-unavailable.
     public init(
         flightPlan: FlightPlan,
         nearestPlace: @escaping @Sendable (Coordinate) -> BearingToPlace? = { _ in nil },
-        motionSampleRateHz: Double = 50.0
+        motionSampleRateHz: Double = 50.0,
+        forecastLookup: @escaping @Sendable (Double, Double, Date) -> Double? = { _, _, _ in nil }
     ) {
         self.flightPlan = flightPlan
         self.nearestPlace = nearestPlace
+        self.forecastLookup = forecastLookup
         self.turbulenceEstimator = TurbulenceEstimator(sampleRateHz: motionSampleRateHz)
     }
 
@@ -168,20 +174,32 @@ public final class Estimator {
             position: position,
             motion: motion,
             cabin: cabin,
-            turbulence: assembleTurbulence(),
+            turbulence: assembleTurbulence(
+                alongTrackFlown: route.alongTrackFlown.value, altitudeMetres: position.altitudeGPS.value, at: now
+            ),
             route: route,
             phase: phase
         )
     }
 
-    /// §4.1's measured turbulence, real as of 1.2 — `forecastEdrCubeRoot` stays
-    /// `.unavailable` until 1.6's GTG comparison lands; the schema has carried that
-    /// field since 1.0 specifically so this moment needs no migration.
-    private func assembleTurbulence() -> TurbulenceEstimate {
+    /// §4.1's measured turbulence, real as of 1.2. §4.3's forecast comparison, real
+    /// as of 1.6 -- `forecastLookup` answers `nil` (reported as `.unavailable`, not
+    /// a stub value) whenever no route forecast was fetched pre-flight, or the
+    /// current position/altitude/time falls outside what was fetched.
+    private func assembleTurbulence(alongTrackFlown: Double?, altitudeMetres: Double?, at time: Date) -> TurbulenceEstimate {
         guard let sample = latestTurbulenceSample else { return .unavailable }
+
+        let forecast: Channel<Double>
+        if let alongTrackFlown, let altitudeMetres,
+           let value = forecastLookup(alongTrackFlown, altitudeMetres, time) {
+            forecast = Channel(value: value, source: .forecast)
+        } else {
+            forecast = .unavailable
+        }
+
         return TurbulenceEstimate(
             edrCubeRoot: sample.edrCubeRoot.map { Channel(value: $0, source: .derived) } ?? .unavailable,
-            forecastEdrCubeRoot: .unavailable,
+            forecastEdrCubeRoot: forecast,
             attitudeGateOpen: Channel(value: sample.attitudeGateOpen, source: .derived)
         )
     }
