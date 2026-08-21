@@ -9,6 +9,9 @@ options:
 packages:
   ContrailKit:
     path: Packages/ContrailKit
+  MapLibre:
+    github: maplibre/maplibre-gl-native-distribution
+    from: 6.10.0
 
 targets:
   Contrail:
@@ -32,6 +35,12 @@ targets:
         product: ContrailData
       - package: ContrailKit
         product: ContrailStatistics
+      - package: ContrailKit
+        product: ContrailTurbulence
+      - package: ContrailKit
+        product: ContrailMap
+      - package: MapLibre
+        product: MapLibre
     info:
       path: Generated/Info.plist
       properties:

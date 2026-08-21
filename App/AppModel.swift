@@ -37,6 +37,36 @@ final class AppModel {
     private var engine: FlightEstimationEngine?
     private var runTask: Task<Void, Never>?
 
+    // MARK: - Offline basemap (§5.2)
+
+    /// The XYZ tile URL template MapSurface's style JSON points at, once the local
+    /// PMTiles-serving HTTP server is up. `nil` until `startMapServer()` completes --
+    /// MapSurface shows a loading state rather than pointing MapLibre at a dead port.
+    private(set) var mapTileURLTemplate: String?
+    private var mapServer: PMTilesHTTPServer?
+
+    /// Starts the loopback-only HTTP server that serves the bundled PMTiles basemap
+    /// (see `PMTilesHTTPServer`'s own doc comment for why this exists instead of the
+    /// `pmtiles://` custom URL scheme). Called once at launch, same as
+    /// `verifyBundledAssets()` -- this is itself a bundled-asset verification: if the
+    /// file is missing or the server can't bind loopback, the map surface reports that
+    /// honestly instead of showing a blank tile grid.
+    func startMapServer() async {
+        do {
+            let url = try BundledDatasets.basemapURL()
+            let server = try PMTilesHTTPServer(pmtilesFileURL: url)
+            try await server.start()
+            guard let port = await server.port else {
+                lastLogError = "Map server started but reported no port."
+                return
+            }
+            mapServer = server
+            mapTileURLTemplate = "http://127.0.0.1:\(port)/tiles/{z}/{x}/{y}.pbf"
+        } catch {
+            lastLogError = "Could not start the offline basemap server: \(error)"
+        }
+    }
+
     /// Loads and verifies the bundled datasets. Called once at launch — the
     /// pre-flight screen reads `airportAssetStatus`/`placeAssetStatus` directly
     /// rather than re-triggering verification itself.

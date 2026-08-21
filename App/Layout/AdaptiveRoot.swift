@@ -5,9 +5,8 @@ import SwiftUI
 /// (a trait, not a device idiom) — the same three child views compose differently on
 /// either side, never a separate iPad-only or iPhone-only view.
 ///
-/// The map surface (§5.2/§8) isn't built yet — MapLibre isn't wired in this pass —
-/// so this composes the five surfaces that exist today. When the map lands, it
-/// takes the primary/detail slot without restructuring this rule.
+/// Composes six surfaces: pre-flight, map, metrics, statistics, turbulence, fix
+/// quality. Same child views on both branches — only the container differs.
 struct AdaptiveRoot: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -25,6 +24,8 @@ private struct CompactDashboard: View {
         TabView {
             NavigationStack { PreFlightSurface() }
                 .tabItem { Label("Flight", systemImage: "airplane") }
+            NavigationStack { MapSurface() }
+                .tabItem { Label("Map", systemImage: "map") }
             NavigationStack { MetricsSurface() }
                 .tabItem { Label("Metrics", systemImage: "gauge") }
             NavigationStack { StatisticsSurface() }
@@ -40,6 +41,7 @@ private struct CompactDashboard: View {
 private struct RegularDashboard: View {
     private enum Surface: String, CaseIterable, Identifiable {
         case flight = "Flight"
+        case map = "Map"
         case metrics = "Metrics"
         case statistics = "Statistics"
         case turbulence = "Turbulence"
@@ -58,6 +60,7 @@ private struct RegularDashboard: View {
         } detail: {
             switch selection {
             case .flight: PreFlightSurface()
+            case .map: MapSurface()
             case .metrics: MetricsSurface()
             case .statistics: StatisticsSurface()
             case .turbulence: TurbulenceSurface()

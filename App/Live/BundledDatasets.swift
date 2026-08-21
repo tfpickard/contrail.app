@@ -18,6 +18,13 @@ enum BundledDatasets {
         try PlaceIndex(data: loadResource(named: "places", extension: "bin"))
     }
 
+    static func basemapURL() throws -> URL {
+        guard let url = Bundle.main.url(forResource: "basemap-z0-6", withExtension: "pmtiles") else {
+            throw LoadError.resourceMissing("basemap-z0-6.pmtiles")
+        }
+        return url
+    }
+
     /// No `subdirectory:` argument — XcodeGen's `resources:` key (a per-target
     /// grouping concept) doesn't translate into an actual folder in the compiled app
     /// bundle here; individual resource files land flat at the bundle root

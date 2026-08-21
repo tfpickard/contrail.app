@@ -10,6 +10,7 @@ struct ContrailApp: App {
                 .environment(model)
                 .task {
                     model.verifyBundledAssets()
+                    await model.startMapServer()
                 }
         }
     }

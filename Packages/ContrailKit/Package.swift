@@ -22,6 +22,7 @@ let package = Package(
         .library(name: "ContrailData", targets: ["ContrailData"]),
         .library(name: "ContrailStatistics", targets: ["ContrailStatistics"]),
         .library(name: "ContrailTurbulence", targets: ["ContrailTurbulence"]),
+        .library(name: "ContrailMap", targets: ["ContrailMap"]),
         .executable(name: "contrail-prep", targets: ["ContrailPrep"]),
     ],
     targets: [
@@ -62,6 +63,8 @@ let package = Package(
             dependencies: ["ContrailCore", "ContrailSensors"]
         ),
 
+        .target(name: "ContrailMap"),
+
         // MARK: - Dataset compiler (macOS CLI only; not shipped in the app)
 
         .executableTarget(
@@ -97,6 +100,11 @@ let package = Package(
         .testTarget(
             name: "ContrailTurbulenceTests",
             dependencies: ["ContrailTurbulence", "ContrailSensors", "ContrailCore"]
+        ),
+        .testTarget(
+            name: "ContrailMapTests",
+            dependencies: ["ContrailMap"],
+            resources: [.copy("Fixtures")]
         ),
     ],
     swiftLanguageModes: [.v6]
