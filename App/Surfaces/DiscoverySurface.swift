@@ -39,7 +39,7 @@ struct DiscoverySurface: View {
             if let actionError {
                 Section {
                     Label(actionError, systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(ContrailSignal.amber)
                 }
             }
         }
@@ -93,9 +93,9 @@ struct DiscoverySurface: View {
         case .requestedByMe:
             Text("Waiting for them to accept…").font(.caption).foregroundStyle(.secondary)
         case .requestedByThem:
-            Text("Wants to exchange profiles").font(.caption).foregroundStyle(.blue)
+            Text("Wants to exchange profiles").font(.caption).foregroundStyle(ContrailSignal.cyan)
         case .mutuallyAccepted:
-            Text("Exchanged").font(.caption).foregroundStyle(.green)
+            Text("Exchanged").font(.caption).foregroundStyle(ContrailSignal.green)
         }
     }
 

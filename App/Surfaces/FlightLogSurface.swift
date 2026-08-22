@@ -53,7 +53,7 @@ private struct FlightLogRow: View {
                 }
                 if let exportError {
                     Label(exportError, systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(ContrailSignal.amber)
                         .font(.footnote)
                 }
             }

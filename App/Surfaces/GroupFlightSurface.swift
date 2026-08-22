@@ -79,7 +79,7 @@ struct GroupFlightSurface: View {
                 if let errorMessage {
                     Section {
                         Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(ContrailSignal.amber)
                     }
                 }
 

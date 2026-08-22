@@ -83,7 +83,7 @@ struct PreFlightSurface: View {
             if let lastLogError = model.lastLogError {
                 Section {
                     Label(lastLogError, systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(ContrailSignal.amber)
                 }
             }
 
@@ -140,7 +140,7 @@ struct PreFlightSurface: View {
             if let validationError {
                 Section {
                     Label(validationError, systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(ContrailSignal.amber)
                 }
             }
 
@@ -165,10 +165,10 @@ struct PreFlightSurface: View {
             LabeledContent("Fetching forecast") { ProgressView() }
         case .succeeded(let count):
             Label("\(count) forecast points along route", systemImage: "checkmark.circle.fill")
-                .foregroundStyle(.green)
+                .foregroundStyle(ContrailSignal.green)
         case .failed(let message):
             Label(message, systemImage: "xmark.circle.fill")
-                .foregroundStyle(.red)
+                .foregroundStyle(ContrailSignal.red)
                 .lineLimit(2)
         }
     }
@@ -183,11 +183,11 @@ struct PreFlightSurface: View {
                 ProgressView()
             case .verified(let count):
                 Label("\(count) records", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(ContrailSignal.green)
                     .labelStyle(.titleAndIcon)
             case .failed(let message):
                 Label(message, systemImage: "xmark.circle.fill")
-                    .foregroundStyle(.red)
+                    .foregroundStyle(ContrailSignal.red)
                     .lineLimit(1)
             }
         }

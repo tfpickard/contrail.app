@@ -72,7 +72,7 @@ struct RouteIntelligenceSurface: View {
                     .foregroundStyle(.secondary)
             }
             Image(systemName: candidate.reachable ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                .foregroundStyle(candidate.reachable ? .green : .orange)
+                .foregroundStyle(candidate.reachable ? ContrailSignal.green : ContrailSignal.amber)
         }
     }
 

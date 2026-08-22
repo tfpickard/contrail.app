@@ -45,7 +45,7 @@ struct CameraSurface: View {
                         .font(.footnote)
                         .foregroundStyle(.white)
                         .padding(8)
-                        .background(.red.opacity(0.8), in: RoundedRectangle(cornerRadius: 8))
+                        .background(ContrailSignal.red.opacity(0.8), in: RoundedRectangle(cornerRadius: 8))
                         .padding(.bottom, 8)
                 }
                 shutterButton
