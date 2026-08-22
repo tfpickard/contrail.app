@@ -17,6 +17,7 @@ public struct LogRecord: Sendable, Equatable {
     public let turbulence: TurbulenceEstimate
     public let route: RouteRelative
     public let phase: Channel<FlightPhase>
+    public let outsideAir: OutsideAirData
 
     /// `"s"` sample, `"e"` event (1.2's peak events, GPS dropout markers), `"m"` user
     /// marker. Only `.sample` is produced in 1.0; the discriminator exists from day
@@ -38,6 +39,7 @@ public struct LogRecord: Sendable, Equatable {
         self.turbulence = output.turbulence
         self.route = output.route
         self.phase = output.phase
+        self.outsideAir = output.outsideAir
     }
 }
 
@@ -47,6 +49,7 @@ extension LogRecord: Codable {
     private enum CodingKeys: String, CodingKey {
         case schema = "v", kind = "k", t, uptime = "u"
         case position = "pos", motion = "mot", cabin = "cab", turbulence = "trb", route = "rte", phase = "ph"
+        case outsideAir = "oat"
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -61,6 +64,7 @@ extension LogRecord: Codable {
         try container.encode(TurbulenceWire(turbulence), forKey: .turbulence)
         try container.encode(RouteWire(route), forKey: .route)
         try container.encode(phase, forKey: .phase)
+        try container.encode(OutsideAirWire(outsideAir), forKey: .outsideAir)
     }
 
     public init(from decoder: Decoder) throws {
@@ -81,6 +85,9 @@ extension LogRecord: Codable {
         turbulence = try container.decode(TurbulenceWire.self, forKey: .turbulence).model
         route = try container.decode(RouteWire.self, forKey: .route).model
         phase = try container.decode(Channel<FlightPhase>.self, forKey: .phase)
+        // {1,0} lines predate this key entirely -- absence, not corruption, so it
+        // falls back to `.unavailable` rather than failing the whole record.
+        outsideAir = try container.decodeIfPresent(OutsideAirWire.self, forKey: .outsideAir)?.model ?? .unavailable
     }
 }
 
@@ -174,6 +181,17 @@ private struct ETAWire: Codable, Equatable {
     let a: Double, s: TimeInterval, sd: TimeInterval
     init(_ e: ETAEstimate) { a = e.arrival.timeIntervalSince1970; s = e.sigma; sd = e.scheduleDelta }
     var model: ETAEstimate { ETAEstimate(arrival: Date(timeIntervalSince1970: a), sigma: s, scheduleDelta: sd) }
+}
+
+private struct OutsideAirWire: Codable {
+    let sat: Channel<Double>, tas: Channel<Double>, ws: Channel<Double>, wd: Channel<Double>
+
+    init(_ m: OutsideAirData) {
+        sat = m.staticAirTemperature; tas = m.trueAirspeed; ws = m.windSpeed; wd = m.windDirection
+    }
+    var model: OutsideAirData {
+        OutsideAirData(staticAirTemperature: sat, trueAirspeed: tas, windSpeed: ws, windDirection: wd)
+    }
 }
 
 private struct RouteWire: Codable {

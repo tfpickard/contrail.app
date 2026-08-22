@@ -258,6 +258,36 @@ struct EstimatorTests {
         #expect(sawPopulatedEDR)
     }
 
+    @Test func ifeLookupPopulatesOutsideAirWhenProvided() throws {
+        let plan = try makeFlightPlan()
+        let reading = OutsideAirData(
+            staticAirTemperature: Channel(value: -54.0, source: .ife),
+            trueAirspeed: Channel(value: 230.0, source: .ife),
+            windSpeed: .unavailable,
+            windDirection: .unavailable
+        )
+        let estimator = Estimator(flightPlan: plan, ifeLookup: { reading })
+
+        var config = SyntheticFlightLog.Configuration(origin: den, destination: lax, departureTime: departure)
+        config.locationSampleInterval = 5
+        let samples = try SyntheticFlightLog.generate(config)
+
+        let output = try #require(samples.compactMap { estimator.ingest($0) }.first)
+        #expect(output.outsideAir == reading)
+    }
+
+    @Test func outsideAirIsUnavailableWithNoIfeLookupProvided() throws {
+        let plan = try makeFlightPlan()
+        let estimator = Estimator(flightPlan: plan)
+
+        var config = SyntheticFlightLog.Configuration(origin: den, destination: lax, departureTime: departure)
+        config.locationSampleInterval = 5
+        let samples = try SyntheticFlightLog.generate(config)
+
+        let output = try #require(samples.compactMap { estimator.ingest($0) }.first)
+        #expect(output.outsideAir == .unavailable)
+    }
+
     @Test func filteredVerticalAccelerationIsExposedForBurstDetection() throws {
         let plan = try makeFlightPlan()
         let estimator = Estimator(flightPlan: plan, motionSampleRateHz: 50)

@@ -16,6 +16,9 @@ public struct EstimatorOutput: Sendable, Codable, Equatable {
     public let turbulence: TurbulenceEstimate
     public let route: RouteRelative
     public let phase: Channel<FlightPhase>
+    /// Phase 3b -- `.unavailable` on every build until an IFE endpoint is actually
+    /// reachable and probed. See `OutsideAirData`'s own doc comment.
+    public let outsideAir: OutsideAirData
 
     public init(
         t: Date,
@@ -25,7 +28,8 @@ public struct EstimatorOutput: Sendable, Codable, Equatable {
         cabin: CabinEnvironment,
         turbulence: TurbulenceEstimate,
         route: RouteRelative,
-        phase: Channel<FlightPhase>
+        phase: Channel<FlightPhase>,
+        outsideAir: OutsideAirData = .unavailable
     ) {
         self.t = t
         self.uptime = uptime
@@ -35,5 +39,6 @@ public struct EstimatorOutput: Sendable, Codable, Equatable {
         self.turbulence = turbulence
         self.route = route
         self.phase = phase
+        self.outsideAir = outsideAir
     }
 }

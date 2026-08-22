@@ -32,8 +32,10 @@ struct ChannelTests {
         #expect(decoded.source == .unavailable)
     }
 
-    @Test func schemaVersionCurrentIsOneZero() {
+    @Test func schemaVersionCurrentIsMajorOne() {
+        // Minor bumps with every additive schema change (most recently {1,1} for
+        // Phase 3b's `outsideAir`) -- major is the number that actually matters to
+        // pin here, since only a major bump means an old log line stops parsing.
         #expect(SchemaVersion.current.major == 1)
-        #expect(SchemaVersion.current.minor == 0)
     }
 }

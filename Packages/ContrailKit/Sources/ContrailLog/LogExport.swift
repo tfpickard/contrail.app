@@ -10,6 +10,7 @@ public enum LogExport {
         "altitudeGpsM", "groundspeedMS", "trueCourseDeg", "verticalSpeedMS",
         "cabinPressureKPa", "cabinPressureAltitudeM", "pressurizationRateMS",
         "crossTrackErrorM", "alongTrackFlownM", "alongTrackRemainingM", "fractionalProgress",
+        "staticAirTempC", "trueAirspeedMS", "windSpeedMS", "windDirectionDeg",
     ]
 
     /// A flat CSV with one row per sample record (event/marker records are skipped —
@@ -38,6 +39,10 @@ public enum LogExport {
                 record.route.alongTrackFlown.value.map(format) ?? "",
                 record.route.alongTrackRemaining.value.map(format) ?? "",
                 record.route.fractionalProgress.value.map(format) ?? "",
+                record.outsideAir.staticAirTemperature.value.map(format) ?? "",
+                record.outsideAir.trueAirspeed.value.map(format) ?? "",
+                record.outsideAir.windSpeed.value.map(format) ?? "",
+                record.outsideAir.windDirection.value.map(format) ?? "",
             ]
             lines.append(cells.joined(separator: ","))
         }

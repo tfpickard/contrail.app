@@ -16,6 +16,7 @@ public final class Estimator {
     private let flightPlan: FlightPlan
     private let nearestPlace: @Sendable (Coordinate) -> BearingToPlace?
     private let forecastLookup: @Sendable (_ alongTrackFlown: Double, _ altitudeMetres: Double, _ time: Date) -> Double?
+    private let ifeLookup: @Sendable () -> OutsideAirData?
 
     // MARK: - Raw channel state
 
@@ -67,15 +68,23 @@ public final class Estimator {
     ///   - forecastLookup: §4.2/§4.3's GTG comparison -- injected the same way as
     ///     `nearestPlace`, so `Estimator` stays ignorant of how (or whether) a route
     ///     forecast was fetched. Defaults to always-unavailable.
+    ///   - ifeLookup: Phase 3b's IFE moving-map probe -- unlike `forecastLookup`,
+    ///     takes no position/time parameters, because IFE data is a live ambient
+    ///     reading, not a route-indexed grid to interpolate. The closure returns a
+    ///     fully-formed `OutsideAirData` (or `nil`) so the caller -- which knows
+    ///     which fields a given endpoint actually reported -- decides per-field
+    ///     `.ife` vs `.unavailable`, not `Estimator`. Defaults to always-unavailable.
     public init(
         flightPlan: FlightPlan,
         nearestPlace: @escaping @Sendable (Coordinate) -> BearingToPlace? = { _ in nil },
         motionSampleRateHz: Double = 50.0,
-        forecastLookup: @escaping @Sendable (Double, Double, Date) -> Double? = { _, _, _ in nil }
+        forecastLookup: @escaping @Sendable (Double, Double, Date) -> Double? = { _, _, _ in nil },
+        ifeLookup: @escaping @Sendable () -> OutsideAirData? = { nil }
     ) {
         self.flightPlan = flightPlan
         self.nearestPlace = nearestPlace
         self.forecastLookup = forecastLookup
+        self.ifeLookup = ifeLookup
         self.turbulenceEstimator = TurbulenceEstimator(sampleRateHz: motionSampleRateHz)
     }
 
@@ -178,7 +187,8 @@ public final class Estimator {
                 alongTrackFlown: route.alongTrackFlown.value, altitudeMetres: position.altitudeGPS.value, at: now
             ),
             route: route,
-            phase: phase
+            phase: phase,
+            outsideAir: ifeLookup() ?? .unavailable
         )
     }
 

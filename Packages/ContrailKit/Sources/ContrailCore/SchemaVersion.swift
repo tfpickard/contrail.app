@@ -12,5 +12,8 @@ public struct SchemaVersion: Sendable, Codable, Equatable {
         self.minor = minor
     }
 
-    public static let current = SchemaVersion(major: 1, minor: 0)
+    /// {1,1} adds `EstimatorOutput.outsideAir` (Phase 3b) -- additive, so every
+    /// {1,0} log line still parses; `outsideAir` was already `.unavailable`-shaped
+    /// for anything reading an older file that never wrote the key.
+    public static let current = SchemaVersion(major: 1, minor: 1)
 }
