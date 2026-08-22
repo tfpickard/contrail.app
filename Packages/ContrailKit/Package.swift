@@ -27,6 +27,7 @@ let package = Package(
         .library(name: "ContrailForecast", targets: ["ContrailForecast"]),
         .library(name: "ContrailIdentity", targets: ["ContrailIdentity"]),
         .library(name: "ContrailIFE", targets: ["ContrailIFE"]),
+        .library(name: "ContrailDiscovery", targets: ["ContrailDiscovery"]),
         .executable(name: "contrail-prep", targets: ["ContrailPrep"]),
     ],
     targets: [
@@ -98,6 +99,14 @@ let package = Package(
             dependencies: ["ContrailCore"]
         ),
 
+        // Phase 3a -- Passenger discovery. Foundation-only, transport-agnostic, and
+        // deliberately has no dependency on ContrailCore or anything else in this
+        // package -- it doesn't need to know a flight, a route, or a Channel exists.
+        // Real CoreBluetooth/MultipeerConnectivity conformers of the transport
+        // protocols here live in the App layer (which does need those frameworks),
+        // same split as ContrailSensors/LiveSensorSource.
+        .target(name: "ContrailDiscovery"),
+
         // MARK: - Dataset compiler (macOS CLI only; not shipped in the app)
 
         .executableTarget(
@@ -154,6 +163,10 @@ let package = Package(
         .testTarget(
             name: "ContrailIFETests",
             dependencies: ["ContrailIFE", "ContrailCore"]
+        ),
+        .testTarget(
+            name: "ContrailDiscoveryTests",
+            dependencies: ["ContrailDiscovery"]
         ),
     ],
     swiftLanguageModes: [.v6]
