@@ -55,6 +55,16 @@ struct ProfileSurface: View {
 
             Section {
                 NavigationLink {
+                    InsightsSurface()
+                } label: {
+                    FeatureCard(
+                        title: "Insights", subtitle: "Route stats, forecast skill, aircraft & seat comparison",
+                        systemImage: "chart.xyaxis.line", signal: ContrailSignal.amber
+                    )
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
                     GroupFlightSurface()
                 } label: {
                     FeatureCard(

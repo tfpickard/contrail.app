@@ -2,6 +2,7 @@ import SwiftUI
 import ContrailCore
 import ContrailGeo
 import ContrailData
+import ContrailLog
 
 /// §5.1/§5's pre-flight screen: manual entry (the `FlightResolver` protocol's
 /// AeroAPI-backed conformance is a later phase — see the session's build notes),
@@ -14,6 +15,7 @@ struct PreFlightSurface: View {
     @State private var originICAO = ""
     @State private var destinationICAO = ""
     @State private var aircraftType = ""
+    @State private var seatPosition: SeatPosition?
     @State private var scheduledDeparture = Date()
     @State private var scheduledArrival = Date().addingTimeInterval(2 * 3600)
     @State private var validationError: String?
@@ -110,7 +112,7 @@ struct PreFlightSurface: View {
                 assetRow("ARTCC boundaries", status: model.artccAssetStatus)
             }
 
-            Section("Flight") {
+            Section {
                 TextField("Flight number", text: $flightNumber)
                     .textInputAutocapitalization(.characters)
                 TextField("Origin ICAO", text: $originICAO)
@@ -119,6 +121,20 @@ struct PreFlightSurface: View {
                     .textInputAutocapitalization(.characters)
                 TextField("Aircraft type (optional)", text: $aircraftType)
                     .textInputAutocapitalization(.characters)
+                Picker("Seat (optional)", selection: $seatPosition) {
+                    Text("Not entered").tag(SeatPosition?.none)
+                    ForEach(SeatPosition.allCases, id: \.self) { position in
+                        Text(position.displayName).tag(SeatPosition?.some(position))
+                    }
+                }
+            } header: {
+                Text("Flight")
+            } footer: {
+                Text(
+                    "Where you sat relative to the wing -- entirely optional, and "
+                    + "only used later to compare ride quality by seat position "
+                    + "under Insights."
+                )
             }
 
             Section("Schedule") {
@@ -220,7 +236,7 @@ struct PreFlightSurface: View {
                 aircraftICAOType: aircraftType.isEmpty ? nil : aircraftType.uppercased(),
                 aircraftRegistration: nil
             )
-            model.startFlight(plan, origin: origin, destination: destination)
+            model.startFlight(plan, origin: origin, destination: destination, seatPosition: seatPosition)
         } catch {
             validationError = "Could not compute the route: \(error)"
         }

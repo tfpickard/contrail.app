@@ -49,6 +49,8 @@ targets:
         product: ContrailIFE
       - package: ContrailKit
         product: ContrailDiscovery
+      - package: ContrailKit
+        product: ContrailAnalytics
       - package: MapLibre
         product: MapLibre
     info:

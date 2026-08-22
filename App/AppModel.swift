@@ -304,11 +304,21 @@ final class AppModel {
         airportIndex?.airport(icao: icao)
     }
 
+    /// The same bundled ARTCC boundary index `RouteIntelligenceEngine` uses live,
+    /// exposed read-only for `InsightsSurface`'s `AirspaceHistoryCompiler` call --
+    /// Phase 4 reuses the dataset rather than loading a second copy of it.
+    func artccBoundaryIndex() -> ARTCCBoundaryIndex? {
+        artccIndex
+    }
+
     /// `origin`/`destination` are the resolved `AirportRecord`s the pre-flight form
     /// looked up, not just the `Coordinate`s `FlightPlan` carries -- the manifest
     /// (§6: "fully self-describing years later with no network") needs the ICAO/IATA
     /// codes and elevation that `FlightPlan` deliberately doesn't retain.
-    func startFlight(_ plan: FlightPlan, origin: AirportRecord, destination: AirportRecord) {
+    func startFlight(
+        _ plan: FlightPlan, origin: AirportRecord, destination: AirportRecord,
+        seatPosition: SeatPosition? = nil
+    ) {
         stopFlight()
 
         flightPlan = plan
@@ -336,7 +346,7 @@ final class AppModel {
         if let directory {
             writeManifest(
                 flightID: Self.flightID(for: plan), flightDirectory: directory,
-                plan: plan, origin: origin, destination: destination
+                plan: plan, origin: origin, destination: destination, seatPosition: seatPosition
             )
         }
 
@@ -481,7 +491,7 @@ final class AppModel {
     /// like any other non-fatal logging problem.
     private func writeManifest(
         flightID: String, flightDirectory: URL, plan: FlightPlan,
-        origin: AirportRecord, destination: AirportRecord
+        origin: AirportRecord, destination: AirportRecord, seatPosition: SeatPosition?
     ) {
         do {
             let manifest = FlightManifest(
@@ -499,7 +509,8 @@ final class AppModel {
                         blockTime: plan.scheduledBlockTime
                     ),
                     aircraft: .init(icaoType: plan.aircraftICAOType, registration: plan.aircraftRegistration),
-                    filedRoute: nil
+                    filedRoute: nil,
+                    seatPosition: seatPosition
                 ),
                 assets: try bundledAssetInfos(),
                 forecast: nil,
