@@ -28,6 +28,7 @@ let package = Package(
         .library(name: "ContrailIdentity", targets: ["ContrailIdentity"]),
         .library(name: "ContrailIFE", targets: ["ContrailIFE"]),
         .library(name: "ContrailDiscovery", targets: ["ContrailDiscovery"]),
+        .library(name: "ContrailAnalytics", targets: ["ContrailAnalytics"]),
         .executable(name: "contrail-prep", targets: ["ContrailPrep"]),
     ],
     targets: [
@@ -99,6 +100,15 @@ let package = Package(
             dependencies: ["ContrailCore"]
         ),
 
+        // Phase 4 -- Meta-analysis: reads the accumulated corpus (FlightManifest +
+        // LogRecord), writes no new sensor code. Depends on ContrailData for the
+        // bundled ARTCC boundary dataset (airspace-crossed history) -- the only
+        // reason this isn't Foundation-only like ContrailIdentity.
+        .target(
+            name: "ContrailAnalytics",
+            dependencies: ["ContrailCore", "ContrailLog", "ContrailData"]
+        ),
+
         // Phase 3a -- Passenger discovery. Foundation-only, transport-agnostic, and
         // deliberately has no dependency on ContrailCore or anything else in this
         // package -- it doesn't need to know a flight, a route, or a Channel exists.
@@ -167,6 +177,10 @@ let package = Package(
         .testTarget(
             name: "ContrailDiscoveryTests",
             dependencies: ["ContrailDiscovery"]
+        ),
+        .testTarget(
+            name: "ContrailAnalyticsTests",
+            dependencies: ["ContrailAnalytics", "ContrailCore", "ContrailLog", "ContrailData"]
         ),
     ],
     swiftLanguageModes: [.v6]
