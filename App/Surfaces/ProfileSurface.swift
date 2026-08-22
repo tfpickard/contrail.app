@@ -2,10 +2,12 @@ import SwiftUI
 import ContrailLog
 import ContrailIdentity
 
-/// ROADMAP Phase 2 -- Identity. Two halves, kept visually distinct: "About You" is
-/// freeform and editable, "Generated From Your Flights" is computed from logged
-/// flights and never touched by the user -- the same "self-reported vs. derived"
-/// split `UserProfile`/`GeneratedProfileStats` draw in code.
+/// ROADMAP Phase 2 -- Identity, redesigned as a hub: your profile, what your flight
+/// history says about you, and the two social surfaces (Group Flight, Nearby
+/// Passengers) that used to be separate top-level tabs. Generated stats use the
+/// same instrument-tile styling as `InstrumentsSurface` deliberately -- they're
+/// computed from real logged flights, not self-reported, so they earn the same
+/// "measured/derived" treatment as a groundspeed readout, not plain list rows.
 struct ProfileSurface: View {
     @Environment(AppModel.self) private var model
 
@@ -13,17 +15,26 @@ struct ProfileSurface: View {
     @State private var homeBaseICAO = ""
     @State private var bio = ""
     @State private var didLoadProfile = false
+    @State private var isEditing = false
 
     var body: some View {
-        Form {
-            Section("About You") {
-                TextField("Display name", text: $displayName)
-                    .textInputAutocapitalization(.words)
-                TextField("Home base ICAO (optional)", text: $homeBaseICAO)
-                    .textInputAutocapitalization(.characters)
-                TextField("Bio", text: $bio, axis: .vertical)
-                    .lineLimit(3...8)
-                Button("Save Profile") { saveProfile() }
+        List {
+            Section {
+                identityCard
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+            }
+
+            if isEditing {
+                Section("About You") {
+                    TextField("Display name", text: $displayName)
+                        .textInputAutocapitalization(.words)
+                    TextField("Home base ICAO (optional)", text: $homeBaseICAO)
+                        .textInputAutocapitalization(.characters)
+                    TextField("Bio", text: $bio, axis: .vertical)
+                        .lineLimit(3...8)
+                    Button("Save") { saveProfile() }
+                }
             }
 
             Section {
@@ -33,7 +44,7 @@ struct ProfileSurface: View {
             } footer: {
                 Text(
                     "Computed from every flight you've logged. Nothing here is "
-                    + "self-reported -- it's derived, which is what makes it "
+                    + "self-reported — it's derived, which is what makes it "
                     + "interesting."
                 )
             }
@@ -41,8 +52,39 @@ struct ProfileSurface: View {
             Section("Share") {
                 shareLatestFlightRow
             }
+
+            Section {
+                NavigationLink {
+                    GroupFlightSurface()
+                } label: {
+                    FeatureCard(
+                        title: "Group Flight", subtitle: "Combine your trace with a fellow passenger's",
+                        systemImage: "person.2", signal: ContrailSignal.cyan
+                    )
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    DiscoverySurface()
+                } label: {
+                    FeatureCard(
+                        title: "Nearby Passengers", subtitle: "Find others running Contrail on your flight",
+                        systemImage: "person.2.wave.2", signal: ContrailSignal.green
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+            .padding(.horizontal)
+            .padding(.vertical, 4)
         }
-        .navigationTitle("Profile")
+        .navigationTitle("You")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(isEditing ? "Done" : "Edit") { isEditing.toggle() }
+            }
+        }
         .onAppear {
             if !didLoadProfile {
                 displayName = model.profile.displayName
@@ -55,6 +97,36 @@ struct ProfileSurface: View {
         .refreshable { model.refreshGeneratedProfileStats() }
     }
 
+    private var identityCard: some View {
+        HStack(spacing: 14) {
+            Image(systemName: "person.crop.circle.fill")
+                .font(.system(size: 44))
+                .foregroundStyle(ContrailSignal.cyan)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(model.profile.displayName.isEmpty ? "Add your name" : model.profile.displayName)
+                    .font(.system(.title2, design: .rounded, weight: .bold))
+                    .foregroundStyle(model.profile.displayName.isEmpty ? .secondary : .primary)
+                if let homeBase = model.profile.homeBaseICAO, !homeBase.isEmpty {
+                    Label(homeBase, systemImage: "house")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                if !model.profile.bio.isEmpty {
+                    Text(model.profile.bio)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(3)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .padding(.horizontal)
+        .padding(.top, 4)
+    }
+
     private func saveProfile() {
         model.updateProfile(
             UserProfile(
@@ -63,6 +135,7 @@ struct ProfileSurface: View {
                 bio: bio
             )
         )
+        isEditing = false
     }
 
     @ViewBuilder
@@ -72,40 +145,88 @@ struct ProfileSurface: View {
             Text("Log a flight to start building this out.")
                 .foregroundStyle(.secondary)
         } else {
-            LabeledContent("Flights logged", value: "\(stats.flightsLogged)")
-            LabeledContent("Hours airborne", value: String(format: "%.1f", stats.hoursAtAltitude))
-            LabeledContent(
-                "Distance flown", value: String(format: "%.0f nm", stats.totalDistanceNauticalMiles)
-            )
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible())], spacing: 10) {
+                InstrumentTile(
+                    label: "FLIGHTS", value: "\(stats.flightsLogged)", unit: nil, signal: ContrailSignal.cyan
+                )
+                InstrumentTile(
+                    label: "HOURS", value: String(format: "%.1f", stats.hoursAtAltitude), unit: "hr",
+                    signal: ContrailSignal.cyan
+                )
+                InstrumentTile(
+                    label: "DISTANCE", value: String(format: "%.0f", stats.totalDistanceNauticalMiles), unit: "nm",
+                    signal: ContrailSignal.cyan
+                )
+                if let averageDelta = stats.averageScheduleDeltaSeconds {
+                    InstrumentTile(
+                        label: "SCHEDULE", value: scheduleDeltaValue(averageDelta), unit: "min",
+                        signal: averageDelta <= 0 ? ContrailSignal.green : ContrailSignal.amber
+                    )
+                }
+            }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+            .padding(.horizontal)
+
+            if let luckDelta = stats.turbulenceLuckDelta {
+                luckBadge(luckDelta)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+                    .padding(.horizontal)
+                    .padding(.top, 2)
+            }
+
             ForEach(stats.routes) { route in
                 LabeledContent(route.route, value: "\(route.count)×")
             }
             if let roughest = stats.roughestRoute, let edr = roughest.averageEDRCubeRoot {
-                LabeledContent("Roughest route", value: "\(roughest.route) (\(String(format: "%.2f", edr)))")
+                LabeledContent("Roughest route") {
+                    Text("\(roughest.route) · \(String(format: "%.2f", edr)) EDR^(1/3)")
+                }
             }
             if let smoothest = stats.smoothestRoute, let edr = smoothest.averageEDRCubeRoot {
-                LabeledContent("Smoothest route", value: "\(smoothest.route) (\(String(format: "%.2f", edr)))")
-            }
-            if let luckDelta = stats.turbulenceLuckDelta {
-                LabeledContent("Turbulence luck", value: luckDescription(luckDelta))
-            }
-            if let averageDelta = stats.averageScheduleDeltaSeconds {
-                LabeledContent("Average schedule delta", value: scheduleDeltaDescription(averageDelta))
+                LabeledContent("Smoothest route") {
+                    Text("\(smoothest.route) · \(String(format: "%.2f", edr)) EDR^(1/3)")
+                }
             }
         }
     }
 
-    /// §4.3's residual sign, restated in plain language: negative means your
-    /// flights consistently ran smoother than GTG predicted.
-    private func luckDescription(_ delta: Double) -> String {
-        let magnitude = String(format: "%.2f", abs(delta))
-        if abs(delta) < 0.02 { return "About what forecasts predict" }
-        return delta < 0 ? "Lucky, by \(magnitude)" : "Cursed, by \(magnitude)"
+    /// §4.3's residual sign, restated as the "genuinely charming statistical
+    /// observation" ROADMAP Phase 2 calls for: negative means smoother than GTG
+    /// predicted, across every flight with forecast data.
+    @ViewBuilder
+    private func luckBadge(_ delta: Double) -> some View {
+        let isNeutral = abs(delta) < 0.02
+        let isLucky = delta < 0
+        let signal: Color = isNeutral ? .secondary : (isLucky ? ContrailSignal.green : ContrailSignal.amber)
+        let verdict = isNeutral ? "Average" : (isLucky ? "Lucky" : "Cursed")
+
+        HStack(spacing: 12) {
+            Image(systemName: isNeutral ? "equal.circle.fill" : (isLucky ? "cloud.fill" : "bolt.fill"))
+                .font(.title2)
+                .foregroundStyle(signal)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Turbulence luck: \(verdict)")
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                Text(
+                    isNeutral
+                        ? "Your flights run about what GTG predicts."
+                        : "Your flights run \(String(format: "%.2f", abs(delta))) EDR^(1/3) "
+                            + (isLucky ? "smoother" : "rougher") + " than GTG predicts, on average."
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(signal.opacity(0.1), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
-    private func scheduleDeltaDescription(_ seconds: Double) -> String {
-        let minutes = Int((abs(seconds) / 60).rounded())
-        return seconds < 0 ? "\(minutes) min early, on average" : "\(minutes) min late, on average"
+    private func scheduleDeltaValue(_ seconds: Double) -> String {
+        let minutes = Int((seconds / 60).rounded())
+        return minutes >= 0 ? "+\(minutes)" : "\(minutes)"
     }
 
     @ViewBuilder

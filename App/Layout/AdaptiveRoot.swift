@@ -2,12 +2,17 @@ import SwiftUI
 
 /// §1's non-negotiable layout rule: "no view may branch on device type." This is the
 /// **only** place that's allowed to branch, and it branches on `horizontalSizeClass`
-/// (a trait, not a device idiom) — the same three child views compose differently on
-/// either side, never a separate iPad-only or iPhone-only view.
+/// (a trait, not a device idiom) — the same five child surfaces compose differently
+/// on either side, never a separate iPad-only or iPhone-only view.
 ///
-/// Composes eleven surfaces: pre-flight, map, metrics, statistics, turbulence, fix
-/// quality, flight log, route intelligence, camera, profile, group flight. Same
-/// child views on both branches — only the container differs.
+/// Five top-level surfaces, deliberately: Flight, Instruments, Map, Log, You. iOS
+/// folds a sixth-plus tab into a generic system "More" list on compact width, which
+/// buried Turbulence, Camera, and Profile -- three of the app's best features --
+/// two taps deep behind a screen nobody designed. `InstrumentsSurface` and
+/// `ProfileSurface` are hubs, not fewer features: Statistics/Fix Quality/Turbulence
+/// live under Instruments as real destinations, and Group Flight/Nearby Passengers
+/// live under You, each still a whole, self-contained surface. Camera and Route
+/// are one tap from the Flight tab's in-flight view, where they're actually needed.
 struct AdaptiveRoot: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -25,28 +30,14 @@ private struct CompactDashboard: View {
         TabView {
             NavigationStack { PreFlightSurface() }
                 .tabItem { Label("Flight", systemImage: "airplane") }
+            NavigationStack { InstrumentsSurface() }
+                .tabItem { Label("Instruments", systemImage: "gauge.with.dots.needle.67percent") }
             NavigationStack { MapSurface() }
                 .tabItem { Label("Map", systemImage: "map") }
-            NavigationStack { MetricsSurface() }
-                .tabItem { Label("Metrics", systemImage: "gauge") }
-            NavigationStack { StatisticsSurface() }
-                .tabItem { Label("Stats", systemImage: "chart.bar") }
-            NavigationStack { TurbulenceSurface() }
-                .tabItem { Label("Turbulence", systemImage: "waveform.path.ecg") }
-            NavigationStack { FixQualitySurface() }
-                .tabItem { Label("Fix", systemImage: "location") }
             NavigationStack { FlightLogSurface() }
                 .tabItem { Label("Log", systemImage: "doc.text") }
-            NavigationStack { RouteIntelligenceSurface() }
-                .tabItem { Label("Route", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
-            NavigationStack { CameraSurface() }
-                .tabItem { Label("Camera", systemImage: "camera") }
             NavigationStack { ProfileSurface() }
-                .tabItem { Label("Profile", systemImage: "person.crop.circle") }
-            NavigationStack { GroupFlightSurface() }
-                .tabItem { Label("Group", systemImage: "person.2") }
-            NavigationStack { DiscoverySurface() }
-                .tabItem { Label("Nearby", systemImage: "person.2.wave.2") }
+                .tabItem { Label("You", systemImage: "person.crop.circle") }
         }
     }
 }
@@ -54,17 +45,10 @@ private struct CompactDashboard: View {
 private struct RegularDashboard: View {
     private enum Surface: String, CaseIterable, Identifiable {
         case flight = "Flight"
+        case instruments = "Instruments"
         case map = "Map"
-        case metrics = "Metrics"
-        case statistics = "Statistics"
-        case turbulence = "Turbulence"
-        case fix = "Fix Quality"
         case log = "Flight Log"
-        case route = "Route"
-        case camera = "Camera"
-        case profile = "Profile"
-        case group = "Group Flight"
-        case discovery = "Nearby Passengers"
+        case profile = "You"
         var id: String { rawValue }
     }
 
@@ -79,17 +63,10 @@ private struct RegularDashboard: View {
         } detail: {
             switch selection {
             case .flight: PreFlightSurface()
+            case .instruments: InstrumentsSurface()
             case .map: MapSurface()
-            case .metrics: MetricsSurface()
-            case .statistics: StatisticsSurface()
-            case .turbulence: TurbulenceSurface()
-            case .fix: FixQualitySurface()
             case .log: FlightLogSurface()
-            case .route: RouteIntelligenceSurface()
-            case .camera: CameraSurface()
             case .profile: ProfileSurface()
-            case .group: GroupFlightSurface()
-            case .discovery: DiscoverySurface()
             case nil: ContentUnavailableView("Select a Surface", systemImage: "sidebar.left")
             }
         }

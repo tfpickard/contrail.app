@@ -55,26 +55,49 @@ struct StatisticsSurface: View {
             if stats.sampleCount == 0 {
                 Text("No samples yet").foregroundStyle(.secondary)
             } else {
-                statRow("Mean", stats.mean, unit: unit, format: format)
-                statRow("Min", stats.min, unit: unit, format: format)
-                statRow("Max", stats.max, unit: unit, format: format)
-                statRow("Std dev", stats.standardDeviation, unit: unit, format: format)
-                statRow("p50", stats.p50, unit: unit, format: format)
-                statRow("p95", stats.p95, unit: unit, format: format)
-                statRow("p99", stats.p99, unit: unit, format: format)
-                LabeledContent("Samples") { Text("\(stats.sampleCount)") }
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Mean")
+                        .font(.instrumentLabel())
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    HStack(alignment: .firstTextBaseline, spacing: 3) {
+                        Text(stats.mean.map { String(format: format, $0) } ?? "—")
+                            .font(.instrumentValue(22))
+                        Text(unit)
+                            .font(.instrumentLabel(12))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.vertical, 2)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        chip("MIN", stats.min, format: format)
+                        chip("MAX", stats.max, format: format)
+                        chip("σ", stats.standardDeviation, format: format)
+                        chip("P50", stats.p50, format: format)
+                        chip("P95", stats.p95, format: format)
+                        chip("P99", stats.p99, format: format)
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 4, leading: 20, bottom: 8, trailing: 20))
+
+                LabeledContent("Samples") { Text("\(stats.sampleCount)").font(.instrumentValue(14)) }
             }
         }
     }
 
     @ViewBuilder
-    private func statRow(_ name: String, _ value: Double?, unit: String, format: String) -> some View {
-        LabeledContent(name) {
-            if let value {
-                Text(String(format: "\(format) \(unit)", value))
-            } else {
-                Text("—")
-            }
+    private func chip(_ label: String, _ value: Double?, format: String) -> some View {
+        VStack(spacing: 2) {
+            Text(label)
+                .font(.instrumentLabel(9))
+                .foregroundStyle(.secondary)
+            Text(value.map { String(format: format, $0) } ?? "—")
+                .font(.instrumentValue(13, weight: .medium))
         }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }

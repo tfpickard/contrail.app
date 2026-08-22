@@ -18,10 +18,15 @@ struct CameraSurface: View {
                 )
             } else {
                 cameraBody
+                    // Only spin up AVCaptureSession while there's actually a flight to
+                    // caption a photo against -- starting it unconditionally on every
+                    // appearance of this view would light the camera-in-use indicator
+                    // and burn battery even when the "No Active Flight" state above is
+                    // what's actually showing.
+                    .task { await controller.start() }
             }
         }
         .navigationTitle("Camera")
-        .task { await controller.start() }
     }
 
     private var cameraBody: some View {

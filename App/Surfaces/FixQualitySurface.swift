@@ -12,27 +12,35 @@ struct FixQualitySurface: View {
         List {
             if let position = model.latestOutput?.position {
                 Section("Fix source") {
-                    LabeledContent("Currently displaying") {
+                    HStack {
                         sourceLabel(position.fused.source)
-                    }
-                    if let age = position.timeSinceValidFix.value {
-                        LabeledContent("Time since valid fix") {
-                            Text(String(format: "%.0f s", age))
-                                .foregroundStyle(age > 10 ? .orange : .primary)
+                        Spacer()
+                        if let age = position.timeSinceValidFix.value {
+                            Text(String(format: "%.0f s since fix", age))
+                                .font(.instrumentValue(13, weight: .medium))
+                                .foregroundStyle(age > 10 ? ContrailSignal.amber : .secondary)
                         }
                     }
                 }
 
                 Section("Accuracy") {
-                    LabeledContent("Horizontal") {
-                        Text(position.horizontalAccuracy.value.map { String(format: "%.0f m", $0) } ?? "—")
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                        InstrumentTile(
+                            label: "H ACC", value: position.horizontalAccuracy.value.map { String(format: "%.0f", $0) },
+                            unit: "m", signal: accuracySignal(position.horizontalAccuracy.value)
+                        )
+                        InstrumentTile(
+                            label: "V ACC", value: position.verticalAccuracy.value.map { String(format: "%.0f", $0) },
+                            unit: "m", signal: accuracySignal(position.verticalAccuracy.value)
+                        )
+                        InstrumentTile(
+                            label: "RADIUS", value: position.confidenceRadius.value.map { String(format: "%.0f", $0) },
+                            unit: "m", signal: accuracySignal(position.confidenceRadius.value)
+                        )
                     }
-                    LabeledContent("Vertical") {
-                        Text(position.verticalAccuracy.value.map { String(format: "%.0f m", $0) } ?? "—")
-                    }
-                    LabeledContent("Confidence radius") {
-                        Text(position.confidenceRadius.value.map { String(format: "%.0f m", $0) } ?? "—")
-                    }
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+                    .padding(.horizontal)
                 }
 
                 Section("Estimates") {
@@ -59,13 +67,20 @@ struct FixQualitySurface: View {
         switch source {
         case .fused, .gnss:
             Label("Live GNSS", systemImage: "location.fill")
-                .foregroundStyle(.green)
+                .foregroundStyle(ContrailSignal.green)
         case .deadReckoned:
             Label("Dead reckoned", systemImage: "location.slash.fill")
-                .foregroundStyle(.orange)
+                .foregroundStyle(ContrailSignal.amber)
         default:
             Text("—")
         }
+    }
+
+    private func accuracySignal(_ value: Double?) -> Color {
+        guard let value else { return .secondary }
+        if value <= 15 { return ContrailSignal.green }
+        if value <= 50 { return ContrailSignal.amber }
+        return ContrailSignal.red
     }
 
     private func coordinateText(_ coordinate: Coordinate?) -> some View {

@@ -49,6 +49,33 @@ struct PreFlightSurface: View {
                 }
             }
 
+            Section {
+                NavigationLink {
+                    CameraSurface()
+                } label: {
+                    FeatureCard(
+                        title: "Camera", subtitle: "Capture a geotagged, captioned photo",
+                        systemImage: "camera", signal: ContrailSignal.cyan
+                    )
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    RouteIntelligenceSurface()
+                } label: {
+                    FeatureCard(
+                        title: "Route", subtitle: "ARTCC jurisdiction, on-route fixes, divert options",
+                        systemImage: "point.topleft.down.curvedto.point.bottomright.up",
+                        signal: ContrailSignal.green
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+            .padding(.horizontal)
+            .padding(.vertical, 2)
+
             Section("Turbulence Forecast") {
                 forecastStatusRow
             }
