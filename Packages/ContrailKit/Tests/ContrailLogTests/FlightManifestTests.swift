@@ -30,7 +30,8 @@ struct FlightManifestTests {
                     blockTime: 8400
                 ),
                 aircraft: FlightManifest.AircraftInfo(icaoType: "B738", registration: nil),
-                filedRoute: nil
+                filedRoute: nil,
+                seatPosition: .overWing
             ),
             assets: [
                 FlightManifest.AssetInfo(
@@ -68,5 +69,31 @@ struct FlightManifestTests {
         let decoded = try JSONDecoder().decode(FlightManifest.self, from: data)
         #expect(decoded.assets.count == 1)
         #expect(decoded.assets[0].verified == true)
+    }
+
+    @Test func seatPositionRoundTripsAndSerializesAsExplicitValue() throws {
+        let manifest = makeManifest()
+        let data = try JSONEncoder().encode(manifest)
+        let decoded = try JSONDecoder().decode(FlightManifest.self, from: data)
+        #expect(decoded.flight.seatPosition == .overWing)
+
+        let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let flight = object?["flight"] as? [String: Any]
+        #expect(flight?["seatPosition"] as? String == "over_wing")
+    }
+
+    /// A manifest written before Phase 4 has no "seatPosition" key at all -- not
+    /// even a null one, since the key didn't exist yet. Must still decode.
+    @Test func decodingAPreSeatPositionManifestFallsBackToNil() throws {
+        let manifest = makeManifest()
+        var data = try JSONEncoder().encode(manifest)
+        var object = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        var flight = object["flight"] as! [String: Any]
+        flight.removeValue(forKey: "seatPosition")
+        object["flight"] = flight
+        data = try JSONSerialization.data(withJSONObject: object)
+
+        let decoded = try JSONDecoder().decode(FlightManifest.self, from: data)
+        #expect(decoded.flight.seatPosition == nil)
     }
 }

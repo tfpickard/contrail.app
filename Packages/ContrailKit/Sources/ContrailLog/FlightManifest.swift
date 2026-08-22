@@ -69,12 +69,17 @@ public struct FlightManifest: Sendable, Equatable {
         /// §5.3: the filed route waypoint string, when available. Always `nil` in
         /// 1.0 — the field exists so 1.4 (route intelligence) never migrates a log.
         public let filedRoute: [String]?
+        /// Phase 4: self-reported at the gate, optional -- see `SeatPosition`'s own
+        /// doc comment for why this can never be anything but manual entry.
+        public let seatPosition: SeatPosition?
         public init(
             number: String, date: String, origin: AirportInfo, destination: AirportInfo,
-            scheduled: ScheduledTimes, aircraft: AircraftInfo, filedRoute: [String]?
+            scheduled: ScheduledTimes, aircraft: AircraftInfo, filedRoute: [String]?,
+            seatPosition: SeatPosition? = nil
         ) {
             self.number = number; self.date = date; self.origin = origin; self.destination = destination
             self.scheduled = scheduled; self.aircraft = aircraft; self.filedRoute = filedRoute
+            self.seatPosition = seatPosition
         }
     }
 
@@ -133,7 +138,7 @@ public struct FlightManifest: Sendable, Equatable {
 
 extension FlightManifest.FlightInfo: Codable {
     private enum CodingKeys: String, CodingKey {
-        case number, date, origin, destination, scheduled, aircraft, filedRoute
+        case number, date, origin, destination, scheduled, aircraft, filedRoute, seatPosition
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -149,6 +154,11 @@ extension FlightManifest.FlightInfo: Codable {
         } else {
             try container.encodeNil(forKey: .filedRoute)
         }
+        if let seatPosition {
+            try container.encode(seatPosition, forKey: .seatPosition)
+        } else {
+            try container.encodeNil(forKey: .seatPosition)
+        }
     }
 
     public init(from decoder: Decoder) throws {
@@ -160,6 +170,10 @@ extension FlightManifest.FlightInfo: Codable {
         scheduled = try container.decode(FlightManifest.ScheduledTimes.self, forKey: .scheduled)
         aircraft = try container.decode(FlightManifest.AircraftInfo.self, forKey: .aircraft)
         filedRoute = try container.decodeIfPresent([String].self, forKey: .filedRoute)
+        // Manifests written before Phase 4 have no "seatPosition" key at all --
+        // decodeIfPresent tolerates that the same way it already tolerates a
+        // missing filedRoute key from before 1.4.
+        seatPosition = try container.decodeIfPresent(SeatPosition.self, forKey: .seatPosition)
     }
 }
 
