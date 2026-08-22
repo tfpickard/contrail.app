@@ -26,6 +26,7 @@ let package = Package(
         .library(name: "ContrailPhoto", targets: ["ContrailPhoto"]),
         .library(name: "ContrailForecast", targets: ["ContrailForecast"]),
         .library(name: "ContrailIdentity", targets: ["ContrailIdentity"]),
+        .library(name: "ContrailIFE", targets: ["ContrailIFE"]),
         .executable(name: "contrail-prep", targets: ["ContrailPrep"]),
     ],
     targets: [
@@ -88,6 +89,15 @@ let package = Package(
             dependencies: ["ContrailCore", "ContrailLog"]
         ),
 
+        // Phase 3b -- Aircraft data endpoint: a pluggable prober for in-flight-
+        // entertainment moving-map JSON endpoints. Depends only on ContrailCore
+        // (for OutsideAirData/Channel) -- no networking library, URLSession is
+        // injected by the App layer, same pattern as ContrailForecast.
+        .target(
+            name: "ContrailIFE",
+            dependencies: ["ContrailCore"]
+        ),
+
         // MARK: - Dataset compiler (macOS CLI only; not shipped in the app)
 
         .executableTarget(
@@ -140,6 +150,10 @@ let package = Package(
         .testTarget(
             name: "ContrailIdentityTests",
             dependencies: ["ContrailIdentity", "ContrailCore", "ContrailLog"]
+        ),
+        .testTarget(
+            name: "ContrailIFETests",
+            dependencies: ["ContrailIFE", "ContrailCore"]
         ),
     ],
     swiftLanguageModes: [.v6]
