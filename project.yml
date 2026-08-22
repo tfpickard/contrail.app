@@ -45,6 +45,8 @@ targets:
         product: ContrailForecast
       - package: ContrailKit
         product: ContrailIdentity
+      - package: ContrailKit
+        product: ContrailIFE
       - package: MapLibre
         product: MapLibre
     info:
@@ -84,6 +86,13 @@ targets:
           with your flight's position, altitude, and route.
         NSPhotoLibraryAddUsageDescription: >-
           Contrail saves the photos you take in-app to your Photos library.
+        # Phase 3b: probing in-flight-entertainment moving-map endpoints on the
+        # cabin Wi-Fi network requires the Local Network permission prompt (iOS 14+).
+        NSLocalNetworkUsageDescription: >-
+          Contrail looks for your aircraft's in-flight-entertainment system on the
+          local cabin network to read outside air temperature, true airspeed, and
+          wind -- data no phone sensor can measure on its own. This never requires
+          purchasing Wi-Fi.
     settings:
       base:
         SWIFT_VERSION: "6.0"

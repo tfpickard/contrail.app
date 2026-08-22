@@ -6,6 +6,7 @@ import ContrailData
 import ContrailLog
 import ContrailForecast
 import ContrailIdentity
+import ContrailIFE
 
 /// The app's single source of UI-facing state. Owns pre-flight asset verification,
 /// the active flight's `FlightPlan` and live `EstimatorOutput` stream, and the NDJSON
@@ -79,6 +80,44 @@ final class AppModel {
 
     private var engine: FlightEstimationEngine?
     private var runTask: Task<Void, Never>?
+
+    // MARK: - Aircraft data endpoint (Phase 3b)
+
+    private var ifeDataBox: IFEDataBox?
+    private var ifePollingTask: Task<Void, Never>?
+
+    /// Starts a background probe loop and returns the box `Estimator`'s
+    /// `ifeLookup` closure reads from. ROADMAP 3b: "failure costs nothing" -- a
+    /// probe cycle that finds nothing just leaves the box at whatever it last held
+    /// (or `nil`), and the next sample's `outsideAir` reports `.unavailable`
+    /// exactly like any other channel with no producer, never a stale value passed
+    /// off as current.
+    private func startIFEPolling() -> IFEDataBox {
+        let box = IFEDataBox()
+        let prober = IFEProber(fetch: { target in
+            var request = URLRequest(url: target.url)
+            // Short and non-negotiable: most of these targets won't exist on most
+            // flights, and the default 60s URLSession timeout would make a full
+            // probe cycle (four targets) take minutes instead of seconds.
+            request.timeoutInterval = 3
+            let (data, _) = try await URLSession.shared.data(for: request)
+            return data
+        })
+        ifePollingTask = Task {
+            while !Task.isCancelled {
+                let reading = await prober.probe()
+                box.set(reading?.asOutsideAirData())
+                try? await Task.sleep(for: .seconds(15))
+            }
+        }
+        return box
+    }
+
+    private func stopIFEPolling() {
+        ifePollingTask?.cancel()
+        ifePollingTask = nil
+        ifeDataBox = nil
+    }
 
     // MARK: - Identity (Phase 2)
 
@@ -244,11 +283,15 @@ final class AppModel {
             Task { await fetchForecast(for: plan, into: forecastBox) }
         }
 
+        let ifeBox = startIFEPolling()
+        ifeDataBox = ifeBox
+
         let engine = FlightEstimationEngine(
             flightPlan: plan, source: source, nearestPlace: nearestPlace,
             forecastLookup: { [forecastBox] alongTrackFlown, altitudeMetres, time in
                 forecastBox.value(alongTrackFlown: alongTrackFlown, altitudeMetres: altitudeMetres, time: time)
             },
+            ifeLookup: { [ifeBox] in ifeBox.value() },
             logWriter: writer
         )
         self.engine = engine
@@ -279,6 +322,7 @@ final class AppModel {
         divertCandidates = []
         forecastCacheBox = nil
         forecastFetchStatus = .idle
+        stopIFEPolling()
     }
 
     /// §4.2's "pre-flight-side slice," fetched once at flight start while there's

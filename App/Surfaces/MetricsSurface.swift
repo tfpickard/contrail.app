@@ -56,6 +56,23 @@ struct MetricsSurface: View {
                         Text(output.phase.value?.rawValue.capitalized ?? "—")
                     }
                 }
+
+                Section {
+                    metric("Static air temp", output.outsideAir.staticAirTemperature, unit: "°C", format: "%.1f")
+                    metric("True airspeed", output.outsideAir.trueAirspeed, unit: "m/s", format: "%.1f")
+                    metric("Wind speed", output.outsideAir.windSpeed, unit: "m/s", format: "%.1f")
+                    metric("Wind direction", output.outsideAir.windDirection, unit: "°", format: "%.0f")
+                } header: {
+                    Text("Outside Air (IFE)")
+                } footer: {
+                    if output.outsideAir.staticAirTemperature.source == .unavailable {
+                        Text(
+                            "No in-flight-entertainment endpoint found yet -- this is "
+                            + "best-effort and often unavailable. Everything else in "
+                            + "Contrail measures the inside of the cabin, not outside air."
+                        )
+                    }
+                }
             } else {
                 ContentUnavailableView(
                     "No Flight Active",
