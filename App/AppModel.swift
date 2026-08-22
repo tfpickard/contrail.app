@@ -7,6 +7,7 @@ import ContrailLog
 import ContrailForecast
 import ContrailIdentity
 import ContrailIFE
+import ContrailDiscovery
 
 /// The app's single source of UI-facing state. Owns pre-flight asset verification,
 /// the active flight's `FlightPlan` and live `EstimatorOutput` stream, and the NDJSON
@@ -117,6 +118,76 @@ final class AppModel {
         ifePollingTask?.cancel()
         ifePollingTask = nil
         ifeDataBox = nil
+    }
+
+    // MARK: - Passenger discovery (Phase 3a)
+
+    private var discoveryEngine: PassengerDiscoveryEngine?
+    private var bleController: BLEDiscoveryController?
+    private var multipeerTransport: MultipeerAvatarTransport?
+
+    /// ROADMAP 3a: "entirely opt-in and user-initiated. A dedicated screen the
+    /// user deliberately opens." Called only from `DiscoverySurface`'s `onAppear`
+    /// -- nothing else in the app starts advertising or scanning.
+    func startDiscovery() {
+        guard discoveryEngine == nil else { return }
+
+        let sessionID = BeaconPayload.freshSessionID()
+        let ble = BLEDiscoveryController()
+        let multipeer = MultipeerAvatarTransport(mySessionID: sessionID)
+        ble.updateLocalRecord(currentHandshakeRecord())
+        ble.onExchangeRequestReceived = { [weak self] peerID in
+            Task { @MainActor in
+                try? await self?.discoveryEngine?.receiveExchangeRequest(from: peerID)
+            }
+        }
+
+        let engine = PassengerDiscoveryEngine(
+            advertiser: ble, scanner: ble, handshakeTransport: ble, bulkTransport: multipeer,
+            myPayload: BeaconPayload(sessionID: sessionID)
+        )
+        bleController = ble
+        multipeerTransport = multipeer
+        discoveryEngine = engine
+
+        Task {
+            await engine.start()
+            multipeer.start()
+        }
+    }
+
+    func stopDiscovery() {
+        let engine = discoveryEngine
+        let multipeer = multipeerTransport
+        discoveryEngine = nil
+        bleController = nil
+        multipeerTransport = nil
+        Task {
+            await engine?.stop()
+            multipeer?.stop()
+        }
+    }
+
+    func discoveredPeers() async -> [DiscoveredPeer] {
+        await discoveryEngine?.discoveredPeers ?? []
+    }
+
+    func requestProfileExchange(with peerID: UInt64) async throws {
+        try await discoveryEngine?.requestProfileExchange(with: peerID)
+    }
+
+    /// No avatar picker exists yet (Phase 2's `UserProfile` has no image field), so
+    /// `avatarHash` is always `nil` here -- honest absence, not a stub. The
+    /// hash-keyed fetch-once mechanism (`AvatarCache`) is fully built and tested;
+    /// only the "attach a photo to your profile" UI is the missing piece, and it's
+    /// a natural next addition, not a redesign.
+    private func currentHandshakeRecord() -> HandshakeRecord {
+        HandshakeRecord(
+            displayName: profile.displayName.isEmpty ? "Contrail user" : profile.displayName,
+            flightsLogged: generatedProfileStats.flightsLogged,
+            homeBaseICAO: profile.homeBaseICAO,
+            avatarHash: nil
+        )
     }
 
     // MARK: - Identity (Phase 2)

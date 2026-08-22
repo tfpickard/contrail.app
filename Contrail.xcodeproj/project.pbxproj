@@ -8,9 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		053C8642A7DEA91E249B63CD /* FlightLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA73CFBD055EAB710ECDABA2 /* FlightLogStore.swift */; };
+		0630359C87252EEC3D0B4B28 /* DiscoverySurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97417ED8DAA5924DE286397 /* DiscoverySurface.swift */; };
 		070F27561C30A7605AA53D09 /* PhotoCaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC63C682DFF028E6304FD4E /* PhotoCaptureController.swift */; };
 		08529DE03797B41BC6D4BE49 /* RouteIntelligenceSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A72C62A1A8B4E616D83886 /* RouteIntelligenceSurface.swift */; };
 		0DEFCAE33AC97BFD10023CFB /* FlightLogSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = E888B74B5A291CAE43778488 /* FlightLogSurface.swift */; };
+		16BE47F384CE328829AF1A8D /* MultipeerAvatarTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D8316CC85197142842A861 /* MultipeerAvatarTransport.swift */; };
 		1844F6F2FDAB726E2AB70D01 /* BundledDatasets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B278DCF25107982400E6398F /* BundledDatasets.swift */; };
 		1D4B8288173F7034F58930C3 /* places.bin in Resources */ = {isa = PBXBuildFile; fileRef = 3FC401ACE05767EEFED1384A /* places.bin */; };
 		2016D95CDEF95A38EBFDDC51 /* AdaptiveRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A1C45D2E63AE3BCB4B86D8 /* AdaptiveRoot.swift */; };
@@ -33,6 +35,7 @@
 		8822FBCDE51E02C81541BB9F /* RouteIntelligence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B8694648B5E7B5466F34A0 /* RouteIntelligence.swift */; };
 		89E85BF6DC6EA71A126D753D /* ContrailData in Frameworks */ = {isa = PBXBuildFile; productRef = 2BCC1B63BEF7B2289F64110C /* ContrailData */; };
 		94216F838C6B3B29F386D28D /* ContrailForecast in Frameworks */ = {isa = PBXBuildFile; productRef = DD1D8207B0D879A0B718D467 /* ContrailForecast */; };
+		96E1D4C7E0D2D41E88580B2C /* Locked.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E50C275295ED126FAAA3EA /* Locked.swift */; };
 		991A8344CFD72B4E0D4C75CC /* TurbulenceSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = E147F73C3B78D2328C3F69DE /* TurbulenceSurface.swift */; };
 		9E5A9988A469457DCC19AB90 /* LiveSensorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442A28D04C1008537AC81CA2 /* LiveSensorSource.swift */; };
 		9EACE4BD645390D9FCB06F35 /* ContrailTurbulence in Frameworks */ = {isa = PBXBuildFile; productRef = F23D7E6B86515CDB51EB5C95 /* ContrailTurbulence */; };
@@ -40,11 +43,12 @@
 		A7AB1566997C494E9BA95C40 /* PhotoRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F4C58FF0CAA01E1860593E /* PhotoRingBuffer.swift */; };
 		AC68838F48FB4FE41C8D3378 /* FixQualitySurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9483514C6130E773BF9DCC8D /* FixQualitySurface.swift */; };
 		AEA15ED08065DFE25DFDE8A5 /* navfixes.bin in Resources */ = {isa = PBXBuildFile; fileRef = 9D83C89C8C4CCCE63CA3561B /* navfixes.bin */; };
-		AEE57EA366C1BFEB4C7502B8 /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = BFBF113A1166C5D8ED0BFA35 /* MapLibre */; };
+		AEE57EA366C1BFEB4C7502B8 /* ContrailDiscovery in Frameworks */ = {isa = PBXBuildFile; productRef = 40EDE0AD0B9D1A0FE5FEB3B7 /* ContrailDiscovery */; };
 		B345012396EBA7C398862D41 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFAD5055A636A01AD695A52B /* AppModel.swift */; };
 		B78F96DF6620DC4795731171 /* FlightEstimationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E17A4438C2266045DFD0DD /* FlightEstimationEngine.swift */; };
 		B7DDBA9C379328650B78F7F4 /* ContrailApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54924CA940EAF7266C0DEA0 /* ContrailApp.swift */; };
 		B8C41928F70CA1CB2A5FC73A /* basemap-z0-6.pmtiles in Resources */ = {isa = PBXBuildFile; fileRef = A0EBBE1110D6B0155259DA1A /* basemap-z0-6.pmtiles */; };
+		BF9CAECC5D607CD18A71166D /* BLEDiscoveryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C610EFCB453FFFADD9283787 /* BLEDiscoveryController.swift */; };
 		C31CB514563A5038FBBE87D6 /* basemap-style.json in Resources */ = {isa = PBXBuildFile; fileRef = 1C29CF0FAA412BFA0035D64F /* basemap-style.json */; };
 		C6975FE79E2683F4E939AB8E /* MapSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300330A4A4558B9CA3A365CD /* MapSurface.swift */; };
 		D50AABB67AF5999067B7DBEB /* ContrailMap in Frameworks */ = {isa = PBXBuildFile; productRef = 6C2B9A8AF9300B31255104C5 /* ContrailMap */; };
@@ -53,6 +57,7 @@
 		E5F4B453020114477C21BB03 /* ContrailIdentity in Frameworks */ = {isa = PBXBuildFile; productRef = 6BD8FE466A15BF09F07F0DED /* ContrailIdentity */; };
 		EA97E83F98CEADCBF1913D77 /* ContrailEstimator in Frameworks */ = {isa = PBXBuildFile; productRef = BA35708646A97D40EB4307DB /* ContrailEstimator */; };
 		EE161A472B0A1B0C7B513323 /* ContrailLog in Frameworks */ = {isa = PBXBuildFile; productRef = 08F75B0A8BA42893CB144811 /* ContrailLog */; };
+		FEE0E44B3F56B45728009627 /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = BFBF113A1166C5D8ED0BFA35 /* MapLibre */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -70,8 +75,10 @@
 		69B8694648B5E7B5466F34A0 /* RouteIntelligence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteIntelligence.swift; sourceTree = "<group>"; };
 		6B51143711397BB51CB83074 /* MetricsSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsSurface.swift; sourceTree = "<group>"; };
 		72B23E6B62E09B264591E293 /* ContrailKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ContrailKit; path = Packages/ContrailKit; sourceTree = SOURCE_ROOT; };
+		77D8316CC85197142842A861 /* MultipeerAvatarTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipeerAvatarTransport.swift; sourceTree = "<group>"; };
 		810C09FC241F92A75EE62A7E /* Contrail.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Contrail.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83871C2C9F2460DD21AAC7C5 /* PhotoMetadataWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoMetadataWriter.swift; sourceTree = "<group>"; };
+		85E50C275295ED126FAAA3EA /* Locked.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locked.swift; sourceTree = "<group>"; };
 		8A43C08F1F3B2D04A3D7554E /* PMTilesHTTPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PMTilesHTTPServer.swift; sourceTree = "<group>"; };
 		9483514C6130E773BF9DCC8D /* FixQualitySurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixQualitySurface.swift; sourceTree = "<group>"; };
 		9D83C89C8C4CCCE63CA3561B /* navfixes.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = navfixes.bin; sourceTree = "<group>"; };
@@ -79,8 +86,10 @@
 		A0EBBE1110D6B0155259DA1A /* basemap-z0-6.pmtiles */ = {isa = PBXFileReference; path = "basemap-z0-6.pmtiles"; sourceTree = "<group>"; };
 		B278DCF25107982400E6398F /* BundledDatasets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledDatasets.swift; sourceTree = "<group>"; };
 		B5E3803EA2564DB77774A44C /* FlightStatisticsCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightStatisticsCollector.swift; sourceTree = "<group>"; };
+		B97417ED8DAA5924DE286397 /* DiscoverySurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverySurface.swift; sourceTree = "<group>"; };
 		C19666EECF394EEA28B9FFBB /* CameraSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSurface.swift; sourceTree = "<group>"; };
 		C44E38FBE9310E5BC6FCDE49 /* StatisticsSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsSurface.swift; sourceTree = "<group>"; };
+		C610EFCB453FFFADD9283787 /* BLEDiscoveryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDiscoveryController.swift; sourceTree = "<group>"; };
 		CA73CFBD055EAB710ECDABA2 /* FlightLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightLogStore.swift; sourceTree = "<group>"; };
 		CFAD5055A636A01AD695A52B /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		D2CDB3F731E5BF665C1FE2C0 /* ProfileSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSurface.swift; sourceTree = "<group>"; };
@@ -110,7 +119,8 @@
 				94216F838C6B3B29F386D28D /* ContrailForecast in Frameworks */,
 				E5F4B453020114477C21BB03 /* ContrailIdentity in Frameworks */,
 				4EE0D9F6DEA31E04FCD21C0D /* ContrailIFE in Frameworks */,
-				AEE57EA366C1BFEB4C7502B8 /* MapLibre in Frameworks */,
+				AEE57EA366C1BFEB4C7502B8 /* ContrailDiscovery in Frameworks */,
+				FEE0E44B3F56B45728009627 /* MapLibre in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				C19666EECF394EEA28B9FFBB /* CameraSurface.swift */,
+				B97417ED8DAA5924DE286397 /* DiscoverySurface.swift */,
 				9483514C6130E773BF9DCC8D /* FixQualitySurface.swift */,
 				E888B74B5A291CAE43778488 /* FlightLogSurface.swift */,
 				20CFF8442DC9404701C70551 /* GroupFlightSurface.swift */,
@@ -164,6 +175,7 @@
 		8B509D6092F5CE0F20913C72 /* Live */ = {
 			isa = PBXGroup;
 			children = (
+				C610EFCB453FFFADD9283787 /* BLEDiscoveryController.swift */,
 				B278DCF25107982400E6398F /* BundledDatasets.swift */,
 				F5E17A4438C2266045DFD0DD /* FlightEstimationEngine.swift */,
 				CA73CFBD055EAB710ECDABA2 /* FlightLogStore.swift */,
@@ -171,6 +183,8 @@
 				21367E5E66ED93691C913A25 /* ForecastCacheBox.swift */,
 				0E3DA0E37DA8F3FFD5800EC6 /* IFEDataBox.swift */,
 				442A28D04C1008537AC81CA2 /* LiveSensorSource.swift */,
+				85E50C275295ED126FAAA3EA /* Locked.swift */,
+				77D8316CC85197142842A861 /* MultipeerAvatarTransport.swift */,
 				2FC63C682DFF028E6304FD4E /* PhotoCaptureController.swift */,
 				83871C2C9F2460DD21AAC7C5 /* PhotoMetadataWriter.swift */,
 				58F4C58FF0CAA01E1860593E /* PhotoRingBuffer.swift */,
@@ -267,6 +281,7 @@
 				DD1D8207B0D879A0B718D467 /* ContrailForecast */,
 				6BD8FE466A15BF09F07F0DED /* ContrailIdentity */,
 				77B6B6AB798904CBDD894896 /* ContrailIFE */,
+				40EDE0AD0B9D1A0FE5FEB3B7 /* ContrailDiscovery */,
 				BFBF113A1166C5D8ED0BFA35 /* MapLibre */,
 			);
 			productName = Contrail;
@@ -334,9 +349,11 @@
 			files = (
 				2016D95CDEF95A38EBFDDC51 /* AdaptiveRoot.swift in Sources */,
 				B345012396EBA7C398862D41 /* AppModel.swift in Sources */,
+				BF9CAECC5D607CD18A71166D /* BLEDiscoveryController.swift in Sources */,
 				1844F6F2FDAB726E2AB70D01 /* BundledDatasets.swift in Sources */,
 				2A2266B9BCB370D5DFB6610A /* CameraSurface.swift in Sources */,
 				B7DDBA9C379328650B78F7F4 /* ContrailApp.swift in Sources */,
+				0630359C87252EEC3D0B4B28 /* DiscoverySurface.swift in Sources */,
 				AC68838F48FB4FE41C8D3378 /* FixQualitySurface.swift in Sources */,
 				B78F96DF6620DC4795731171 /* FlightEstimationEngine.swift in Sources */,
 				053C8642A7DEA91E249B63CD /* FlightLogStore.swift in Sources */,
@@ -346,8 +363,10 @@
 				74B72154A93C13FC8F1FC280 /* GroupFlightSurface.swift in Sources */,
 				6A787D69C5E9E392C64342DD /* IFEDataBox.swift in Sources */,
 				9E5A9988A469457DCC19AB90 /* LiveSensorSource.swift in Sources */,
+				96E1D4C7E0D2D41E88580B2C /* Locked.swift in Sources */,
 				C6975FE79E2683F4E939AB8E /* MapSurface.swift in Sources */,
 				4DBA6CBAFC8C54606AA4EE25 /* MetricsSurface.swift in Sources */,
+				16BE47F384CE328829AF1A8D /* MultipeerAvatarTransport.swift in Sources */,
 				5E92CAE7CB16C03BF778295A /* PMTilesHTTPServer.swift in Sources */,
 				070F27561C30A7605AA53D09 /* PhotoCaptureController.swift in Sources */,
 				20630AAC57EF7E23E2E4BD03 /* PhotoMetadataWriter.swift in Sources */,
@@ -586,6 +605,10 @@
 		2BCC1B63BEF7B2289F64110C /* ContrailData */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ContrailData;
+		};
+		40EDE0AD0B9D1A0FE5FEB3B7 /* ContrailDiscovery */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ContrailDiscovery;
 		};
 		6BD8FE466A15BF09F07F0DED /* ContrailIdentity */ = {
 			isa = XCSwiftPackageProductDependency;

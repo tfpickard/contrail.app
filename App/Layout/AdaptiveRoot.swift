@@ -45,6 +45,8 @@ private struct CompactDashboard: View {
                 .tabItem { Label("Profile", systemImage: "person.crop.circle") }
             NavigationStack { GroupFlightSurface() }
                 .tabItem { Label("Group", systemImage: "person.2") }
+            NavigationStack { DiscoverySurface() }
+                .tabItem { Label("Nearby", systemImage: "person.2.wave.2") }
         }
     }
 }
@@ -62,6 +64,7 @@ private struct RegularDashboard: View {
         case camera = "Camera"
         case profile = "Profile"
         case group = "Group Flight"
+        case discovery = "Nearby Passengers"
         var id: String { rawValue }
     }
 
@@ -86,6 +89,7 @@ private struct RegularDashboard: View {
             case .camera: CameraSurface()
             case .profile: ProfileSurface()
             case .group: GroupFlightSurface()
+            case .discovery: DiscoverySurface()
             case nil: ContentUnavailableView("Select a Surface", systemImage: "sidebar.left")
             }
         }

@@ -47,6 +47,8 @@ targets:
         product: ContrailIdentity
       - package: ContrailKit
         product: ContrailIFE
+      - package: ContrailKit
+        product: ContrailDiscovery
       - package: MapLibre
         product: MapLibre
     info:
@@ -92,7 +94,20 @@ targets:
           Contrail looks for your aircraft's in-flight-entertainment system on the
           local cabin network to read outside air temperature, true airspeed, and
           wind -- data no phone sensor can measure on its own. This never requires
-          purchasing Wi-Fi.
+          purchasing Wi-Fi. Contrail also uses the local network to exchange
+          profiles with fellow passengers you've chosen to connect with on the
+          Nearby Passengers tab.
+        # Phase 3a: MultipeerConnectivity's peer-to-peer Wi-Fi (AWDL) transport --
+        # the bulk avatar transfer half of passenger discovery -- is built on
+        # Bonjour under the hood and needs its service type declared here.
+        NSBonjourServices:
+          - _contrail-av._tcp
+          - _contrail-av._udp
+        NSBluetoothAlwaysUsageDescription: >-
+          Contrail uses Bluetooth to find fellow passengers running Contrail on
+          your flight. Advertising only reveals that you run the app -- nothing
+          about you is shared until you choose to exchange profiles with someone
+          specific, from the Nearby Passengers tab you open yourself.
     settings:
       base:
         SWIFT_VERSION: "6.0"
